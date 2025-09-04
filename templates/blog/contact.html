@@ -3,108 +3,168 @@
 {% block title %}ติดต่อเรา - CivicBlogs{% endblock %}
 
 {% block content %}
-<div class="p-4">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h1 class="display-4 fw-bold mb-4">ติดต่อเรา</h1>
-            <p class="lead mb-5">เราพร้อมที่จะรับฟังข้อเสนอแนะและคำแนะนำจากคุณ</p>
+<div class="min-h-screen bg-gray-50 pt-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">ติดต่อ<span class="text-yellow-500">เรา</span></h1>
+            <p class="text-xl text-gray-600">เราพร้อมที่จะรับฟังข้อเสนอแนะและคำแนะนำจากคุณ</p>
+        </div>
+        
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            ส่งข้อความถึงเรา
+                        </h3>
+                    </div>
+                    <div class="p-8">
+                        <form method="post" class="space-y-6">
+                            {% csrf_token %}
+                            <div>
+                                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">ชื่อ *</label>
+                                <input type="text" name="{{ form.name.name }}" id="{{ form.name.id_for_label }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors" required>
+                                {% if form.name.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">อีเมล *</label>
+                                <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors" required>
+                                {% if form.email.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">หัวข้อ *</label>
+                                <input type="text" name="{{ form.subject.name }}" id="{{ form.subject.id_for_label }}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors" required>
+                                {% if form.subject.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.subject.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.message.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">ข้อความ *</label>
+                                <textarea name="{{ form.message.name }}" id="{{ form.message.id_for_label }}" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-colors" required></textarea>
+                                {% if form.message.errors %}
+                                    <div class="text-red-500 text-sm mt-1">{{ form.message.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <button type="submit" class="inline-flex items-center px-6 py-3 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition-colors duration-300 group">
+                                <svg class="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                                ส่งข้อความ
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
             
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>ส่งข้อความถึงเรา</h5>
+            <div class="space-y-6">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 p-6">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ข้อมูลติดต่อ
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">อีเมล</h4>
+                                <p class="text-gray-600">info@civicblogs.com<br>support@civicblogs.com</p>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <form method="post">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label for="{{ form.name.id_for_label }}" class="form-label">ชื่อ *</label>
-                                    {{ form.name }}
-                                    {% if form.name.errors %}
-                                        <div class="text-danger small">{{ form.name.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.email.id_for_label }}" class="form-label">อีเมล *</label>
-                                    {{ form.email }}
-                                    {% if form.email.errors %}
-                                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.subject.id_for_label }}" class="form-label">หัวข้อ *</label>
-                                    {{ form.subject }}
-                                    {% if form.subject.errors %}
-                                        <div class="text-danger small">{{ form.subject.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="{{ form.message.id_for_label }}" class="form-label">ข้อความ *</label>
-                                    {{ form.message }}
-                                    {% if form.message.errors %}
-                                        <div class="text-danger small">{{ form.message.errors.0 }}</div>
-                                    {% endif %}
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i>ส่งข้อความ
-                                </button>
-                            </form>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">โทรศัพท์</h4>
+                                <p class="text-gray-600">02-xxx-xxxx<br>08x-xxx-xxxx</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">ที่อยู่</h4>
+                                <p class="text-gray-600">123 ถนนประชาธิปไตย<br>เขตปทุมวัน<br>กรุงเทพมหานคร 10330</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">เวลาทำการ</h4>
+                                <p class="text-gray-600">จันทร์ - ศุกร์: 9:00 - 18:00<br>เสาร์ - อาทิตย์: 10:00 - 16:00</p>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>ข้อมูลติดต่อ</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <h6><i class="fas fa-envelope text-primary me-2"></i>อีเมล</h6>
-                                <p class="text-muted">info@civicblogs.com<br>support@civicblogs.com</p>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <h6><i class="fas fa-phone text-success me-2"></i>โทรศัพท์</h6>
-                                <p class="text-muted">02-xxx-xxxx<br>08x-xxx-xxxx</p>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <h6><i class="fas fa-map-marker-alt text-danger me-2"></i>ที่อยู่</h6>
-                                <p class="text-muted">123 ถนนประชาธิปไตย<br>เขตปทุมวัน<br>กรุงเทพมหานคร 10330</p>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <h6><i class="fas fa-clock text-warning me-2"></i>เวลาทำการ</h6>
-                                <p class="text-muted">จันทร์ - ศุกร์: 9:00 - 18:00<br>เสาร์ - อาทิตย์: 10:00 - 16:00</p>
-                            </div>
-                        </div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 p-6">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h4a1 1 0 011 1v2m4 0H5a1 1 0 00-1 1v1a1 1 0 001 1h14a1 1 0 001-1V5a1 1 0 00-1-1z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8v10a1 1 0 001 1h12a1 1 0 001-1V8H5z"></path>
+                            </svg>
+                            ติดตามเรา
+                        </h3>
                     </div>
-                    
-                    <div class="card mt-4">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="fab fa-facebook me-2"></i>ติดตามเรา</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <div class="social-links">
-                                <a href="#" class="btn btn-outline-primary me-2 mb-2">
-                                    <i class="fab fa-facebook"></i> Facebook
-                                </a>
-                                <a href="#" class="btn btn-outline-info me-2 mb-2">
-                                    <i class="fab fa-twitter"></i> Twitter
-                                </a>
-                                <a href="#" class="btn btn-outline-danger me-2 mb-2">
-                                    <i class="fab fa-instagram"></i> Instagram
-                                </a>
-                                <a href="#" class="btn btn-outline-success me-2 mb-2">
-                                    <i class="fab fa-line"></i> Line
-                                </a>
-                            </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 gap-3">
+                            <a href="#" class="flex items-center justify-center px-4 py-3 border-2 border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                                Facebook
+                            </a>
+                            <a href="#" class="flex items-center justify-center px-4 py-3 border-2 border-sky-200 text-sky-600 rounded-lg hover:bg-sky-50 transition-colors duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                </svg>
+                                Twitter
+                            </a>
+                            <a href="#" class="flex items-center justify-center px-4 py-3 border-2 border-pink-200 text-pink-600 rounded-lg hover:bg-pink-50 transition-colors duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.042-3.441.219-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.888-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.357-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
+                                </svg>
+                                Instagram
+                            </a>
+                            <a href="#" class="flex items-center justify-center px-4 py-3 border-2 border-green-200 text-green-600 rounded-lg hover:bg-green-50 transition-colors duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771z"/>
+                                </svg>
+                                Line
+                            </a>
                         </div>
                     </div>
                 </div>
