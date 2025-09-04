@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CivicBlogs - แพลตฟอร์มบล็อกสำหรับประชาชน{% endblock %}</title>
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&family=Poppins:wght@100;200;300;400;500;600;700&family=Prompt:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -40,8 +45,18 @@
                         }
                     },
                     fontFamily: {
-                        'sans': ['Kanit', 'system-ui', 'sans-serif'],
-                        'serif': ['Sarabun', 'Georgia', 'serif'],
+                        'sans': ['Inter', 'Prompt', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        'display': ['Poppins', 'Prompt', 'system-ui', 'sans-serif'],
+                        'thai': ['Prompt', 'Sarabun', 'system-ui', 'sans-serif'],
+                    },
+                    fontWeight: {
+                        thin: '100',
+                        extralight: '200', 
+                        light: '300',
+                        normal: '400',
+                        medium: '500',
+                        semibold: '600',
+                        bold: '700',
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-in-out',
@@ -105,7 +120,7 @@
         }
     </style>
 </head>
-<body class="bg-white text-gray-900 font-sans antialiased">
+<body class="bg-white text-gray-900 font-sans font-light antialiased">
     <!-- Navigation -->
     <nav class="fixed top-0 w-full bg-white/80 glass border-b border-gray-100 z-50 transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,7 +132,7 @@
                             <i class="fas fa-pen-nib text-white text-lg"></i>
                         </div>
                         <div class="hidden sm:block">
-                            <h1 class="text-xl font-bold text-gray-900">CivicBlogs</h1>
+                            <h1 class="text-xl font-normal text-gray-900">CivicBlogs</h1>
                             <p class="text-xs text-gray-500 -mt-1">แพลตฟอร์มบล็อกสำหรับประชาชน</p>
                         </div>
                     </a>
@@ -297,7 +312,7 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-6">
                     <i class="fas fa-envelope-open-text text-white text-xl"></i>
                 </div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">รับข้อมูลข่าวสารล่าสุด</h2>
+                <h2 class="text-3xl font-normal text-gray-900 mb-4">รับข้อมูลข่าวสารล่าสุด</h2>
                 <p class="text-gray-600 mb-8">สมัครรับข้อมูลข่าวสารและบทความใหม่ๆ ส่งตรงถึงอีเมลของคุณ</p>
                 
                 <form method="post" action="#" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
@@ -323,7 +338,7 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center">
                             <i class="fas fa-pen-nib text-white"></i>
                         </div>
-                        <h3 class="text-xl font-bold">CivicBlogs</h3>
+                        <h3 class="text-xl font-normal">CivicBlogs</h3>
                     </div>
                     <p class="text-gray-300 mb-6 max-w-md">แพลตฟอร์มบล็อกสำหรับการแบ่งปันข้อมูลข่าวสารและความคิดเห็นด้านสังคม การเมือง และประเด็นสาธารณะ</p>
                     <div class="flex space-x-4">

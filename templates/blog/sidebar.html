@@ -2,7 +2,7 @@
 <div class="space-y-8">
     <!-- Categories -->
     <div class="bg-white rounded-2xl shadow-lg p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <h3 class="text-xl font-normal text-gray-900 mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
@@ -25,7 +25,7 @@
 
     <!-- Popular Tags -->
     <div class="bg-white rounded-2xl shadow-lg p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <h3 class="text-xl font-normal text-gray-900 mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
             </svg>
@@ -51,7 +51,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
             </svg>
         </div>
-        <h3 class="text-xl font-bold mb-2">รับข้อมูลข่าวสาร</h3>
+        <h3 class="text-xl font-normal mb-2">รับข้อมูลข่าวสาร</h3>
         <p class="text-blue-100 mb-4 text-sm">สมัครรับข้อมูลข่าวสารและบทความใหม่ๆ</p>
         <form id="sidebar-newsletter-form" class="space-y-3">
             {% csrf_token %}
@@ -66,7 +66,7 @@
     <!-- Recent Posts (if not on homepage) -->
     {% if request.resolver_match.url_name != 'post_list' %}
     <div class="bg-white rounded-2xl shadow-lg p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <h3 class="text-xl font-normal text-gray-900 mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
