@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CivicBlogs - แพลตฟอร์มบล็อกสำหรับประชาชน{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',  // Main yellow
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        },
+                        gray: {
+                            50: '#fafafa',
+                            100: '#f4f4f5',
+                            200: '#e4e4e7',
+                            300: '#d4d4d8',
+                            400: '#a1a1aa',
+                            500: '#71717a',
+                            600: '#52525b',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Kanit', 'system-ui', 'sans-serif'],
+                        'serif': ['Sarabun', 'Georgia', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="{% block meta_description %}แพลตฟอร์มบล็อกสำหรับการแบ่งปันข้อมูลข่าวสารและความคิดเห็นด้านสังคม การเมือง และประเด็นสาธารณะ{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}บล็อก, ข่าว, การเมือง, สังคม, ประชาชน, civic, thailand{% endblock %}">
+    <meta name="author" content="CivicBlogs">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}CivicBlogs{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}แพลตฟอร์มบล็อกสำหรับประชาชน{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'images/logo-og.jpg' %}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glass {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/80 glass border-b border-gray-100 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Brand -->
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'blog:post_list' %}" class="flex items-center space-x-3 group">
+                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                            <i class="fas fa-pen-nib text-white text-lg"></i>
+                        </div>
+                        <div class="hidden sm:block">
+                            <h1 class="text-xl font-bold text-gray-900">CivicBlogs</h1>
+                            <p class="text-xs text-gray-500 -mt-1">แพลตฟอร์มบล็อกสำหรับประชาชน</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'blog:post_list' %}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-home mr-2"></i>หน้าแรก
+                    </a>
+                    
+                    <!-- Categories Dropdown -->
+                    <div class="relative group">
+                        <button class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200 flex items-center">
+                            <i class="fas fa-folder mr-2"></i>หมวดหมู่
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div class="p-2">
+                                <a href="{% url 'blog:category_detail' 'politics' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">การเมือง</a>
+                                <a href="{% url 'blog:category_detail' 'technology' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">เทคโนโลยี</a>
+                                <a href="{% url 'blog:category_detail' 'society' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สังคม</a>
+                                <a href="{% url 'blog:category_detail' 'environment' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สิ่งแวดล้อม</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'blog:about' %}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-info-circle mr-2"></i>เกี่ยวกับ
+                    </a>
+                    <a href="{% url 'blog:contact' %}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-envelope mr-2"></i>ติดต่อ
+                    </a>
+                </div>
+
+                <!-- Search & User Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Search -->
+                    <div class="hidden md:block">
+                        <form method="GET" action="{% url 'blog:search' %}" class="relative">
+                            <input type="search" name="q" placeholder="ค้นหาบทความ..." value="{{ request.GET.q }}" 
+                                   class="w-64 pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <div class="w-6 h-6 bg-yellow-500 hover:bg-yellow-600 rounded-lg flex items-center justify-center transition-colors duration-200">
+                                    <i class="fas fa-search text-white text-xs"></i>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- User Menu -->
+                    {% if user.is_authenticated %}
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 px-3 py-2 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 rounded-xl transition-colors duration-200">
+                            <i class="fas fa-user-circle text-lg"></i>
+                            <span class="hidden sm:block text-sm font-medium">{{ user.username }}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                            <div class="p-2">
+                                {% if user.is_staff %}
+                                <a href="{% url 'admin:index' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                                    <i class="fas fa-cog mr-2"></i>จัดการระบบ
+                                </a>
+                                <hr class="my-2 border-gray-100">
+                                {% endif %}
+                                <a href="#profile" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                                    <i class="fas fa-user mr-2"></i>โปรไฟล์
+                                </a>
+                                <a href="{% url 'admin:logout' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'admin:login' %}" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-xl transition-colors duration-200">
+                        <i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ
+                    </a>
+                    {% endif %}
+
+                    <!-- Mobile Menu Button -->
+                    <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-gray-700"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="md:hidden bg-white border-t border-gray-100 hidden" id="mobileMenu">
+            <div class="px-4 py-4 space-y-2">
+                <!-- Mobile Search -->
+                <form method="GET" action="{% url 'blog:search' %}" class="mb-4">
+                    <div class="relative">
+                        <input type="search" name="q" placeholder="ค้นหาบทความ..." value="{{ request.GET.q }}" 
+                               class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                    </div>
+                </form>
+
+                <a href="{% url 'blog:post_list' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                    <i class="fas fa-home mr-2"></i>หน้าแรก
+                </a>
+                
+                <!-- Mobile Categories -->
+                <div class="space-y-1">
+                    <p class="px-3 py-2 text-sm font-medium text-gray-500 flex items-center">
+                        <i class="fas fa-folder mr-2"></i>หมวดหมู่
+                    </p>
+                    <a href="{% url 'blog:category_detail' 'politics' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">การเมือง</a>
+                    <a href="{% url 'blog:category_detail' 'technology' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">เทคโนโลยี</a>
+                    <a href="{% url 'blog:category_detail' 'society' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สังคม</a>
+                    <a href="{% url 'blog:category_detail' 'environment' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สิ่งแวดล้อม</a>
+                </div>
+                
+                <a href="{% url 'blog:about' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                    <i class="fas fa-info-circle mr-2"></i>เกี่ยวกับ
+                </a>
+                <a href="{% url 'blog:contact' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                    <i class="fas fa-envelope mr-2"></i>ติดต่อ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16 min-h-screen">
+        <!-- Page Header -->
+        {% block page_header %}{% endblock %}
+        
+        <!-- Messages -->
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            {% for message in messages %}
+            <div class="mb-4 p-4 rounded-xl border-l-4 animate-fade-in {% if message.tags == 'success' %}bg-green-50 border-green-400 text-green-700{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-400 text-yellow-700{% elif message.tags == 'error' %}bg-red-50 border-red-400 text-red-700{% else %}bg-blue-50 border-blue-400 text-blue-700{% endif %}">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">{{ message }}</p>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" onclick="this.parentElement.parentElement.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Newsletter Section -->
+    {% block newsletter %}
+    <section class="bg-gradient-to-r from-yellow-50 to-yellow-100 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-6">
+                    <i class="fas fa-envelope-open-text text-white text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">รับข้อมูลข่าวสารล่าสุด</h2>
+                <p class="text-gray-600 mb-8">สมัครรับข้อมูลข่าวสารและบทความใหม่ๆ ส่งตรงถึงอีเมลของคุณ</p>
+                
+                <form method="post" action="#" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="กรอกอีเมลของคุณ..." required
+                           class="flex-1 px-6 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    <button type="submit" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-xl transition-colors duration-200">
+                        <i class="fas fa-paper-plane mr-2"></i>สมัครรับข่าวสาร
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Brand Column -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-pen-nib text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">CivicBlogs</h3>
+                    </div>
+                    <p class="text-gray-300 mb-6 max-w-md">แพลตฟอร์มบล็อกสำหรับการแบ่งปันข้อมูลข่าวสารและความคิดเห็นด้านสังคม การเมือง และประเด็นสาธารณะ</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-yellow-600 rounded-lg flex items-center justify-center transition-colors duration-200">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-yellow-600 rounded-lg flex items-center justify-center transition-colors duration-200">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-yellow-600 rounded-lg flex items-center justify-center transition-colors duration-200">
+                            <i class="fab fa-line"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-yellow-600 rounded-lg flex items-center justify-center transition-colors duration-200">
+                            <i class="fas fa-rss"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Menu Column -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">เมนู</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'blog:post_list' %}" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">หน้าแรก</a></li>
+                        <li><a href="#about" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">เกี่ยวกับ</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">ติดต่อ</a></li>
+                        <li><a href="#privacy" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">นโยบายความเป็นส่วนตัว</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories Column -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">หมวดหมู่</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">การเมือง</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">เทคโนโลยี</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">สังคม</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-yellow-400 transition-colors duration-200">สิ่งแวดล้อม</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-300 text-sm">&copy; {% now "Y" %} CivicBlogs. สงวนลิขสิทธิ์.</p>
+                <p class="text-gray-300 text-sm mt-2 md:mt-0">
+                    พัฒนาด้วย <i class="fas fa-heart text-yellow-400 mx-1"></i> สำหรับประชาชนไทย
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-6 right-6 w-12 h-12 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 hidden">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Back to Top Button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.remove('hidden');
+            } else {
+                backToTop.classList.add('hidden');
+            }
+        });
+
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.pageYOffset > 50) {
+                navbar.classList.add('bg-white/95', 'shadow-md');
+                navbar.classList.remove('bg-white/80');
+            } else {
+                navbar.classList.add('bg-white/80');
+                navbar.classList.remove('bg-white/95', 'shadow-md');
+            }
+        });
+
+        // Auto-hide Messages
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.animate-fade-in');
+            messages.forEach(msg => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.group');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown.classList.remove('group-hover:opacity-100');
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}ติดต่อเรา - CivicBlogs{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 fw-bold mb-4">ติดต่อเรา</h1>
+            <p class="lead mb-5">เราพร้อมที่จะรับฟังข้อเสนอแนะและคำแนะนำจากคุณ</p>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>ส่งข้อความถึงเรา</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">ชื่อ *</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">อีเมล *</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.subject.id_for_label }}" class="form-label">หัวข้อ *</label>
+                                    {{ form.subject }}
+                                    {% if form.subject.errors %}
+                                        <div class="text-danger small">{{ form.subject.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.message.id_for_label }}" class="form-label">ข้อความ *</label>
+                                    {{ form.message }}
+                                    {% if form.message.errors %}
+                                        <div class="text-danger small">{{ form.message.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>ส่งข้อความ
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>ข้อมูลติดต่อ</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6><i class="fas fa-envelope text-primary me-2"></i>อีเมล</h6>
+                                <p class="text-muted">info@civicblogs.com<br>support@civicblogs.com</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6><i class="fas fa-phone text-success me-2"></i>โทรศัพท์</h6>
+                                <p class="text-muted">02-xxx-xxxx<br>08x-xxx-xxxx</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6><i class="fas fa-map-marker-alt text-danger me-2"></i>ที่อยู่</h6>
+                                <p class="text-muted">123 ถนนประชาธิปไตย<br>เขตปทุมวัน<br>กรุงเทพมหานคร 10330</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6><i class="fas fa-clock text-warning me-2"></i>เวลาทำการ</h6>
+                                <p class="text-muted">จันทร์ - ศุกร์: 9:00 - 18:00<br>เสาร์ - อาทิตย์: 10:00 - 16:00</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fab fa-facebook me-2"></i>ติดตามเรา</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="social-links">
+                                <a href="#" class="btn btn-outline-primary me-2 mb-2">
+                                    <i class="fab fa-facebook"></i> Facebook
+                                </a>
+                                <a href="#" class="btn btn-outline-info me-2 mb-2">
+                                    <i class="fab fa-twitter"></i> Twitter
+                                </a>
+                                <a href="#" class="btn btn-outline-danger me-2 mb-2">
+                                    <i class="fab fa-instagram"></i> Instagram
+                                </a>
+                                <a href="#" class="btn btn-outline-success me-2 mb-2">
+                                    <i class="fab fa-line"></i> Line
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
