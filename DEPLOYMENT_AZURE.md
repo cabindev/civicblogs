@@ -99,8 +99,33 @@ az webapp deployment source config \
 ไปที่ **Configuration** > **General Settings**:
 - **Startup Command**: `python startup.py && gunicorn --bind=0.0.0.0 --timeout 120 civicblogs.wsgi`
 
-### 4. Deploy จาก GitHub
+### 4. ตั้งค่า GitHub Actions (แนะนำ)
 
+#### 4.1 ตั้งค่า Azure Secrets ใน GitHub
+ไปที่ GitHub Repository > **Settings** > **Secrets and variables** > **Actions** และเพิ่ม:
+
+| Secret Name | Value | วิธีหา |
+|------------|-------|-------|
+| `AZURE_CLIENT_ID` | `xxx-xxx-xxx` | Azure Portal > App registrations |
+| `AZURE_TENANT_ID` | `xxx-xxx-xxx` | Azure Portal > Azure Active Directory |
+| `AZURE_SUBSCRIPTION_ID` | `xxx-xxx-xxx` | Azure Portal > Subscriptions |
+
+#### 4.2 สร้าง Service Principal (เพื่อใช้ใน GitHub Actions)
+```bash
+az ad sp create-for-rbac --name "civicblogs-github-actions" \
+  --role contributor \
+  --scopes /subscriptions/{subscription-id}/resourceGroups/civicblogs-rg \
+  --sdk-auth
+```
+
+#### 4.3 Deploy จาก GitHub
+
+**วิธี 1: GitHub Actions (แนะนำ)**
+- ✅ Workflow ถูกสร้างไว้แล้วที่ `.github/workflows/main_civicspace.yml`
+- ✅ Auto-deploy ทุกครั้งที่ push ไป `main` branch
+- ✅ Build และ test อัตโนมัติ
+
+**วิธี 2: Azure Portal Deployment Center**
 ไปที่ **Deployment Center**:
 1. เลือก **GitHub**
 2. เชื่อมต่อกับ Repository: `cabindev/civicblogs`
