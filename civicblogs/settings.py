@@ -190,7 +190,10 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_REDIRECT_EXEMPT = []
-    SECURE_SSL_REDIRECT = True
+    # Disable SSL redirect for Azure App Service (Azure handles SSL termination)
+    SECURE_SSL_REDIRECT = False
+    # Azure App Service proxy headers
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'
