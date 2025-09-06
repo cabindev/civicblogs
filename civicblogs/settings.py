@@ -183,6 +183,20 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Azure Blob Storage settings for production
+if not DEBUG and config('USE_AZURE_STORAGE', default=False, cast=bool):
+    # Azure Storage settings
+    AZURE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME')
+    AZURE_ACCOUNT_KEY = config('AZURE_STORAGE_ACCOUNT_KEY')
+    AZURE_CONTAINER = config('AZURE_STORAGE_CONTAINER_NAME', default='media')
+    
+    # Use Azure Blob Storage for media files
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    
+    # Azure Storage configuration
+    AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+    MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
+
 # Security settings for production
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
