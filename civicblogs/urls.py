@@ -25,6 +25,9 @@ urlpatterns = [
     path('', include('blog.urls')),
 ]
 
+# Serve media files in both development and production
+# Note: For production, consider using Azure Blob Storage for better performance
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
