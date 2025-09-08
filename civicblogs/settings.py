@@ -187,19 +187,34 @@ MEDIA_ROOT = BASE_DIR / 'media'
 try:
     USE_AZURE_STORAGE = config('USE_AZURE_STORAGE', default=False, cast=bool)
     if USE_AZURE_STORAGE:
-        # Azure Storage settings
-        AZURE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME')
-        AZURE_ACCOUNT_KEY = config('AZURE_STORAGE_ACCOUNT_KEY')
-        AZURE_CONTAINER = config('AZURE_STORAGE_CONTAINER_NAME', default='media')
+        # Try Connection String first
+        AZURE_CONNECTION_STRING = config('AZURE_STORAGE_CONNECTION_STRING', default=None)
         
-        # Use Azure Blob Storage for media files
-        DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-        
-        # Azure Storage configuration
-        AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
-        MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
-        
-        print(f"✅ Azure Blob Storage configured: {MEDIA_URL}")
+        if AZURE_CONNECTION_STRING:
+            # Use Connection String method
+            AZURE_STORAGE_CONNECTION_STRING = AZURE_CONNECTION_STRING
+            AZURE_CONTAINER = config('AZURE_STORAGE_CONTAINER_NAME', default='media')
+            
+            # Use Azure Blob Storage for media files
+            DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+            
+            # Extract account name for URL
+            AZURE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME')
+            AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+            MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
+            
+            print(f"✅ Azure Blob Storage configured with Connection String: {MEDIA_URL}")
+        else:
+            # Fallback to individual settings
+            AZURE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME')
+            AZURE_ACCOUNT_KEY = config('AZURE_STORAGE_ACCOUNT_KEY')
+            AZURE_CONTAINER = config('AZURE_STORAGE_CONTAINER_NAME', default='media')
+            
+            DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+            AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+            MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
+            
+            print(f"✅ Azure Blob Storage configured with Account Key: {MEDIA_URL}")
 except Exception as e:
     print(f"⚠️  Azure Blob Storage configuration failed: {e}")
     # Fallback to local storage
