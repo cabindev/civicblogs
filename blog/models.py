@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
-from ckeditor_uploader.fields import RichTextUploadingField
+# from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 from PIL import Image
 import uuid
@@ -49,7 +49,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     excerpt = models.TextField(max_length=300, blank=True, help_text='Brief description of the post')
-    content = RichTextUploadingField()
+    content = models.TextField()
     featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True, storage=None)
     featured_image_alt = models.CharField(max_length=200, blank=True, help_text='Alt text for featured image')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
