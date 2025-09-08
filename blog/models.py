@@ -50,7 +50,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     excerpt = models.TextField(max_length=300, blank=True, help_text='Brief description of the post')
     content = RichTextUploadingField()
-    featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True)
+    featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True, storage=None)
     featured_image_alt = models.CharField(max_length=200, blank=True, help_text='Alt text for featured image')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     tags = TaggableManager(blank=True)
