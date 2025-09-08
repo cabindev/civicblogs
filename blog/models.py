@@ -8,6 +8,13 @@ from PIL import Image
 import uuid
 import os
 
+# Force Azure Blob Storage for images
+try:
+    from storages.backends.azure_storage import AzureStorage
+    azure_storage = AzureStorage()
+except ImportError:
+    azure_storage = None
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -50,7 +57,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     excerpt = models.TextField(max_length=300, blank=True, help_text='Brief description of the post')
     content = models.TextField()
-    featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True, storage=None)
+    featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True, storage=azure_storage)
     featured_image_alt = models.CharField(max_length=200, blank=True, help_text='Alt text for featured image')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     tags = TaggableManager(blank=True)
