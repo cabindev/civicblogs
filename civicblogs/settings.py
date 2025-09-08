@@ -186,7 +186,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Azure Blob Storage settings for production
 try:
     USE_AZURE_STORAGE = config('USE_AZURE_STORAGE', default=False, cast=bool)
-    if not DEBUG and USE_AZURE_STORAGE:
+    if USE_AZURE_STORAGE:
         # Azure Storage settings
         AZURE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME')
         AZURE_ACCOUNT_KEY = config('AZURE_STORAGE_ACCOUNT_KEY')
