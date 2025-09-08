@@ -9,10 +9,10 @@ import uuid
 import os
 
 # Get Azure Storage instance
-def get_azure_storage():
-    from django.conf import settings
-    from django.core.files.storage import get_storage_class
-    return get_storage_class(settings.DEFAULT_FILE_STORAGE)()
+# def get_azure_storage():
+#     from django.conf import settings
+#     from django.core.files.storage import get_storage_class
+#     return get_storage_class(settings.DEFAULT_FILE_STORAGE)()
 
 
 class Category(models.Model):
@@ -56,7 +56,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     excerpt = models.TextField(max_length=300, blank=True, help_text='Brief description of the post')
     content = models.TextField()
-    featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True, storage=get_azure_storage)
+    featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True)
     featured_image_alt = models.CharField(max_length=200, blank=True, help_text='Alt text for featured image')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     tags = TaggableManager(blank=True)
