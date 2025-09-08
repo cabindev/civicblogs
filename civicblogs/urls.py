@@ -18,10 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from blog.views import debug_storage_settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('debug-storage/', debug_storage_settings, name='debug_storage'),
     path('', include('blog.urls')),
 ]
 

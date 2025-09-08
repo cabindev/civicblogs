@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.contrib import messages
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from taggit.models import Tag
@@ -132,3 +132,37 @@ class NewsletterSubscribeView(FormView):
 
 class AboutView(TemplateView):
     template_name = 'blog/about.html'
+
+
+def debug_storage_settings(request):
+    """Debug view to check Azure Blob Storage configuration"""
+    from django.conf import settings
+    from decouple import config
+    import json
+    
+    debug_info = {
+        'DEBUG': settings.DEBUG,
+        'USE_AZURE_STORAGE': config('USE_AZURE_STORAGE', default=False, cast=bool),
+        'MEDIA_URL': settings.MEDIA_URL,
+        'DEFAULT_FILE_STORAGE': getattr(settings, 'DEFAULT_FILE_STORAGE', 'Default Django'),
+        'AZURE_ACCOUNT_NAME': getattr(settings, 'AZURE_ACCOUNT_NAME', 'NOT SET'),
+        'AZURE_CONTAINER': getattr(settings, 'AZURE_CONTAINER', 'NOT SET'),
+        'Latest Commit': '4269d82 - Enable Azure Blob Storage for development environment',
+    }
+    
+    # Test Azure Storage
+    try:
+        if config('USE_AZURE_STORAGE', default=False, cast=bool):
+            from storages.backends.azure_storage import AzureStorage
+            storage = AzureStorage()
+            debug_info['Azure Storage Test'] = 'SUCCESS - AzureStorage initialized'
+            debug_info['Test URL'] = storage.url('test.jpg')
+        else:
+            debug_info['Azure Storage Test'] = 'SKIPPED - USE_AZURE_STORAGE=False'
+    except Exception as e:
+        debug_info['Azure Storage Test'] = f'ERROR: {str(e)}'
+    
+    return HttpResponse(
+        f"<pre>{json.dumps(debug_info, indent=2)}</pre>",
+        content_type='text/html'
+    )
