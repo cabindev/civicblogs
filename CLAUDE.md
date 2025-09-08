@@ -182,7 +182,8 @@ def upload_featured_image(instance, filename):
 ```
 
 ### Storage Locations
-- **Images**: `/Applications/MAMP/htdocs/civicblogs/media/blog/featured_images/`
+- **Development Images**: `/Applications/MAMP/htdocs/civicblogs/media/blog/featured_images/`
+- **Production Images**: Azure Blob Storage (`civicblogs12/media`)
 - **CKEditor uploads**: `/Applications/MAMP/htdocs/civicblogs/media/uploads/`
 - **Image metadata**: Stored in Supabase database
 
@@ -207,12 +208,19 @@ class SupabaseBackend:
 
 ### Environment Variables
 ```bash
+# Development (.env)
 DEBUG=True
 SECRET_KEY=django-insecure-your-secret-key
 USE_POSTGRES=True
 DATABASE_URL=postgresql://...
 SUPABASE_URL=https://...
 SUPABASE_KEY=eyJ...
+
+# Azure Blob Storage (Production)
+USE_AZURE_STORAGE=True
+AZURE_STORAGE_ACCOUNT_NAME=civicblogs12
+AZURE_STORAGE_ACCOUNT_KEY=[Your Azure Storage Account Key]
+AZURE_STORAGE_CONTAINER_NAME=media
 ```
 
 ## Troubleshooting
@@ -353,22 +361,57 @@ python3 manage.py migrate
 python3 manage.py shell -c "from blog.models import Category, Post; print('Categories:', Category.objects.count(), 'Posts:', Post.objects.count())"
 ```
 
+## Deployment Architecture
+
+### Azure Cloud Infrastructure
+- **Web App**: civicspace (Azure App Service)
+- **Storage**: civicblogs12 (Azure Blob Storage)  
+- **Database**: Supabase PostgreSQL (External)
+- **Resource Group**: civicspace_group
+- **Region**: Southeast Asia
+
+### Deployment Pipeline
+- **Source Control**: GitHub (cabindev/civicblogs)
+- **CI/CD**: GitHub Actions
+- **Auto-Deploy**: Trigger on push to main branch
+- **Environment**: Production with auto-scaling
+
+### Azure Blob Storage Configuration
+```python
+# Production media storage
+if not DEBUG and config('USE_AZURE_STORAGE', default=False, cast=bool):
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    AZURE_ACCOUNT_NAME = 'civicblogs12'
+    AZURE_CONTAINER = 'media'
+    AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+    MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
+```
+
+### Production URLs
+- **Website**: https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net
+- **Admin**: https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net/admin
+- **Media Storage**: https://civicblogs12.blob.core.windows.net/media/
+
 ## Next Steps
 
 1. ✅ **Tailwind CSS Migration** - Completed
-2. ✅ **Professional Homepage Design** - Completed
+2. ✅ **Professional Homepage Design** - Completed  
 3. ✅ **Responsive Layout** - Completed
-4. 🔄 **Post Detail Page** - Need to update with Tailwind CSS
-5. 🔄 **Category Pages** - Need to create with new design
-6. 🔄 **Search Functionality** - Implement backend search
-7. 🔄 **Performance Optimization** - Image optimization and caching
-8. 🔄 **Production Deployment** - Configure for production
+4. ✅ **Azure Deployment** - Completed
+5. ✅ **Azure Blob Storage** - Configured for media files
+6. ✅ **GitHub Actions CI/CD** - Auto-deploy pipeline active
+7. 🔄 **Test Media Upload** - Verify Azure Blob Storage integration
+8. 🔄 **Post Detail Page** - Update with Tailwind CSS
+9. 🔄 **Category Pages** - Create with new design
+10. 🔄 **Search Functionality** - Implement backend search
 
 ---
 
-**Last Updated**: September 4, 2025  
+**Last Updated**: September 8, 2025  
 **Django Version**: 5.2.5  
 **Database**: Supabase PostgreSQL  
 **Frontend**: Tailwind CSS (Migrated from Bootstrap)  
-**Status**: Production Ready ✅  
+**Deployment**: Azure App Service with GitHub Actions  
+**Storage**: Azure Blob Storage for media files  
+**Status**: Production Deployed ✅  
 **Design Status**: Modern Professional UI Complete ✅
