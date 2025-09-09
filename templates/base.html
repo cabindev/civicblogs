@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CivicBlogs - แพลตฟอร์มบล็อกสำหรับประชาชน{% endblock %}</title>
+    <title>{% block title %}CivicSpace - พื้นที่พลเมืองร่วมหาทางออกปัญหาแอลกอฮอล์{% endblock %}</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,13 +82,13 @@
     {% block extra_css %}{% endblock %}
     
     <!-- Meta Tags -->
-    <meta name="description" content="{% block meta_description %}แพลตฟอร์มบล็อกสำหรับการแบ่งปันข้อมูลข่าวสารและความคิดเห็นด้านสังคม การเมือง และประเด็นสาธารณะ{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}บล็อก, ข่าว, การเมือง, สังคม, ประชาชน, civic, thailand{% endblock %}">
-    <meta name="author" content="CivicBlogs">
+    <meta name="description" content="{% block meta_description %}พื้นที่พลเมืองร่วมหาทางออกปัญหาแอลกอฮอล์ แบ่งปันข้อมูลข่าวสาร การขับเคลื่อนงาน และความร่วมมือในการแก้ไขปัญหาเครื่องดื่มแอลกอฮอล์{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}แอลกอฮอล์, งดเหล้า, สุขภาพ, สังคม, พลเมือง, CivicSpace, โพธิ์แก้ว{% endblock %}">
+    <meta name="author" content="สำนักงานเครือข่ายองค์กรงดเหล้า">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="{% block og_title %}CivicBlogs{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}แพลตฟอร์มบล็อกสำหรับประชาชน{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}CivicSpace{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}พื้นที่พลเมืองร่วมหาทางออกปัญหาแอลกอฮอล์{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{% static 'images/logo-og.jpg' %}{% endblock %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:type" content="website">
@@ -133,8 +133,8 @@
                             <i class="fas fa-pen-nib text-white text-lg"></i>
                         </div>
                         <div class="hidden sm:block">
-                            <h1 class="text-xl font-normal text-gray-900">CivicBlogs</h1>
-                            <p class="text-xs text-gray-500 -mt-1">แพลตฟอร์มบล็อกสำหรับประชาชน</p>
+                            <h1 class="text-xl font-normal text-gray-900">CivicSpace</h1>
+                            <p class="text-xs text-gray-500 -mt-1">พื้นที่พลเมืองร่วมหาทางออกปัญหาแอลกอฮอล์</p>
                         </div>
                     </a>
                 </div>
@@ -314,7 +314,7 @@
                     <i class="fas fa-envelope-open-text text-white text-xl"></i>
                 </div>
                 <h2 class="text-3xl font-normal text-gray-900 mb-4">รับข้อมูลข่าวสารล่าสุด</h2>
-                <p class="text-gray-600 mb-8">สมัครรับข้อมูลข่าวสารและบทความใหม่ๆ ส่งตรงถึงอีเมลของคุณ</p>
+                <p class="text-gray-600 mb-8">สมัครรับข้อมูลข่าวสารและบทความเกี่ยวกับการขับเคลื่อนงานแก้ไขปัญหาแอลกอฮอล์</p>
                 
                 <form method="post" action="#" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
                     {% csrf_token %}
@@ -339,9 +339,9 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center">
                             <i class="fas fa-pen-nib text-white"></i>
                         </div>
-                        <h3 class="text-xl font-normal">CivicBlogs</h3>
+                        <h3 class="text-xl font-normal">CivicSpace</h3>
                     </div>
-                    <p class="text-gray-300 mb-6 max-w-md">แพลตฟอร์มบล็อกสำหรับการแบ่งปันข้อมูลข่าวสารและความคิดเห็นด้านสังคม การเมือง และประเด็นสาธารณะ</p>
+                    <p class="text-gray-300 mb-6 max-w-md">พื้นที่พลเมืองร่วมหาทางออกปัญหาแอลกอฮอล์ แบ่งปันข้อมูลข่าวสาร การขับเคลื่อนงาน และความร่วมมือในการแก้ไขปัญหาเครื่องดื่มแอลกอฮอล์</p>
                     <div class="flex space-x-4">
                         <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-yellow-600 rounded-lg flex items-center justify-center transition-colors duration-200">
                             <i class="fab fa-facebook-f"></i>
@@ -381,11 +381,34 @@
                 </div>
             </div>
 
-            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-300 text-sm">&copy; {% now "Y" %} CivicBlogs. สงวนลิขสิทธิ์.</p>
-                <p class="text-gray-300 text-sm mt-2 md:mt-0">
-                    พัฒนาด้วย <i class="fas fa-heart text-yellow-400 mx-1"></i> สำหรับประชาชนไทย
-                </p>
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Contact Info -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-yellow-400">ติดต่อเรา</h4>
+                        <div class="text-gray-300 text-sm space-y-2">
+                            <p class="font-medium">สำนักงานเครือข่ายองค์กรงดเหล้า</p>
+                            <p>110/287-288 ม.6 ซอยโพธิ์แก้ว แยก 4</p>
+                            <p>ถ.โพธิ์แก้ว แขวงคลองกุ่ม เขตบึงกุ่ม</p>
+                            <p>กทม. 10240</p>
+                            <div class="mt-3 space-y-1">
+                                <p><i class="fas fa-phone mr-2"></i>02 948 3300</p>
+                                <p><i class="fas fa-fax mr-2"></i>02 948 3930</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Copyright -->
+                    <div class="md:text-right">
+                        <p class="text-gray-300 text-sm">&copy; {% now "Y" %} CivicSpace - สำนักงานเครือข่ายองค์กรงดเหล้า</p>
+                        <p class="text-gray-300 text-sm mt-2">
+                            พื้นที่พลเมืองร่วมหาทางออกปัญหาแอลกอฮอล์
+                        </p>
+                        <p class="text-gray-300 text-sm mt-2">
+                            พัฒนาด้วย <i class="fas fa-heart text-yellow-400 mx-1"></i> เพื่อสังคมไทย
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>

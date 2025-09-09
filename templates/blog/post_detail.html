@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ post.title }} - CivicBlogs{% endblock %}
+{% block title %}{{ post.title }} - CivicSpace{% endblock %}
 
 {% block meta_description %}{{ post.meta_description|default:post.get_excerpt|truncatewords:25 }}{% endblock %}
 {% block meta_keywords %}{{ post.meta_keywords }}{% if post.tags.all %}, {% for tag in post.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% endblock %}
