@@ -281,8 +281,8 @@ if not DEBUG:
     SECURE_REFERRER_POLICY = 'same-origin'
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
     
-    # Content Security Policy
-    CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'https:')
+    # Content Security Policy (relaxed for CKEditor)
+    CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", 'https:', 'data:')
     CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", 
                       'https://cdn.tailwindcss.com',
                       'https://cdnjs.cloudflare.com',
@@ -292,11 +292,13 @@ if not DEBUG:
                      'https://cdnjs.cloudflare.com',
                      'https://fonts.googleapis.com',
                      'https://fonts.gstatic.com')
-    CSP_FONT_SRC = ("'self'",
+    CSP_FONT_SRC = ("'self'", 'data:',
                     'https://fonts.gstatic.com',
                     'https://cdnjs.cloudflare.com')
-    CSP_IMG_SRC = ("'self'", 'data:', 'https:', 'http:')
-    CSP_CONNECT_SRC = ("'self'",)
+    CSP_IMG_SRC = ("'self'", 'data:', 'https:', 'http:', 'blob:')
+    CSP_CONNECT_SRC = ("'self'", 'https:')
+    CSP_FRAME_SRC = ("'self'",)
+    CSP_MEDIA_SRC = ("'self'", 'https:', 'data:')
 else:
     # Development security settings (more lenient)
     SECURE_BROWSER_XSS_FILTER = True
@@ -325,18 +327,38 @@ CKEDITOR_BROWSE_SHOW_DIRS = True
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'Custom',
-        'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['Link', 'Unlink'],
-            ['RemoveFormat', 'Source'],
-            ['Undo', 'Redo'],
-        ],
-        'height': 400,
+        'toolbar': 'full',
+        'height': 500,
         'width': '100%',
-        'removePlugins': 'elementspath',
         'resize_enabled': True,
+        'tabSpaces': 4,
+        'extraPlugins': ','.join([
+            'uploadimage',
+            'div',
+            'autolink',
+            'autoembed',
+            'embedsemantic',
+            'autogrow',
+            'widget',
+            'lineutils',
+            'clipboard',
+            'dialog',
+            'dialogui',
+            'elementspath'
+        ]),
+        'removePlugins': '',
+        'allowedContent': True,
+        'fillEmptyBlocks': True,
+        'entities': False,
+        'basicEntities': False,
+        'entities_greek': False,
+        'entities_latin': False,
+        'format_tags': 'p;h1;h2;h3;h4;h5;h6;pre;address;div',
+        'colorButton_colors': '000,800000,8B4513,2F4F4F,008080,000080,4B0082,696969,B22222,A52A2A,DAA520,006400,40E0D0,0000CD,800080,808080,F00,FF8C00,FFD700,008000,0FF,00F,EE82EE,A9A9A9,FFA07A,98FB98,87CEEB,778899,B0C4DE,FFFFE0,00FFFF,F0E68C,E6E6FA,FFF',
+        'format_p': {
+            'element': 'p',
+            'attributes': {'style': 'margin: 0; padding: 0 0 1em 0;'}
+        },
     },
 }
 
