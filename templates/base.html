@@ -153,10 +153,13 @@
                         </button>
                         <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                             <div class="p-2">
-                                <a href="{% url 'blog:category_detail' 'politics' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">การเมือง</a>
-                                <a href="{% url 'blog:category_detail' 'technology' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">เทคโนโลยี</a>
-                                <a href="{% url 'blog:category_detail' 'society' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สังคม</a>
-                                <a href="{% url 'blog:category_detail' 'environment' %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สิ่งแวดล้อม</a>
+                                {% for category in global_categories %}
+                                <a href="{% url 'blog:category_detail' category.slug %}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                                    {{ category.name }} {% if category.post_count %}<span class="text-xs text-gray-500">({{ category.post_count }})</span>{% endif %}
+                                </a>
+                                {% empty %}
+                                <div class="px-3 py-2 text-sm text-gray-500">ยังไม่มีหมวดหมู่</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -249,10 +252,13 @@
                     <p class="px-3 py-2 text-sm font-medium text-gray-500 flex items-center">
                         <i class="fas fa-folder mr-2"></i>หมวดหมู่
                     </p>
-                    <a href="{% url 'blog:category_detail' 'politics' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">การเมือง</a>
-                    <a href="{% url 'blog:category_detail' 'technology' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">เทคโนโลยี</a>
-                    <a href="{% url 'blog:category_detail' 'society' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สังคม</a>
-                    <a href="{% url 'blog:category_detail' 'environment' %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">สิ่งแวดล้อม</a>
+                    {% for category in global_categories %}
+                    <a href="{% url 'blog:category_detail' category.slug %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
+                        {{ category.name }} {% if category.post_count %}<span class="text-xs text-gray-400">({{ category.post_count }})</span>{% endif %}
+                    </a>
+                    {% empty %}
+                    <div class="px-6 py-2 text-sm text-gray-500">ยังไม่มีหมวดหมู่</div>
+                    {% endfor %}
                 </div>
                 
                 <a href="{% url 'blog:about' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
