@@ -6,5 +6,5 @@ def global_context(request):
     return {
         'global_categories': Category.objects.annotate(
             post_count=Count('posts', filter=Q(posts__status='published'))
-        ).filter(post_count__gt=0).order_by('name')
+        ).order_by('name')
     }
