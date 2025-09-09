@@ -24,28 +24,52 @@ class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'created_at'
     list_per_page = 25
+    actions = ['mark_as_published', 'mark_as_draft', 'delete_selected_posts']
     
     fieldsets = (
-        ('Basic Information', {
+        ('ข้อมูลพื้นฐาน', {
             'fields': ('title', 'slug', 'author', 'category', 'status')
         }),
-        ('Content', {
-            'fields': ('excerpt', 'content')
+        ('เนื้อหา', {
+            'fields': ('content',)
         }),
-        ('Media', {
+        ('รูปภาพ', {
             'fields': ('featured_image', 'featured_image_alt')
         }),
         ('SEO', {
             'fields': ('meta_description', 'meta_keywords'),
             'classes': ('collapse',)
         }),
-        ('Tags', {
+        ('แท็ก', {
             'fields': ('tags',)
         }),
-        ('Publishing', {
+        ('การเผยแพร่', {
             'fields': ('published_at',)
         }),
     )
+    
+    def mark_as_published(self, request, queryset):
+        from django.utils import timezone
+        updated = 0
+        for post in queryset:
+            post.status = 'published'
+            if not post.published_at:
+                post.published_at = timezone.now()
+            post.save()
+            updated += 1
+        self.message_user(request, f'{updated} บทความได้รับการเผยแพร่แล้ว')
+    mark_as_published.short_description = "เผยแพร่บทความที่เลือก"
+    
+    def mark_as_draft(self, request, queryset):
+        queryset.update(status='draft')
+        self.message_user(request, f'{queryset.count()} บทความถูกเปลี่ยนเป็น Draft แล้ว')
+    mark_as_draft.short_description = "เปลี่ยนเป็น Draft"
+    
+    def delete_selected_posts(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'{count} บทความถูกลบแล้ว')
+    delete_selected_posts.short_description = "ลบบทความที่เลือก"
     
     def save_model(self, request, obj, form, change):
         if not change:

@@ -2,11 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
-# from ckeditor_uploader.fields import RichTextUploadingField
+from ckeditor.fields import RichTextField
 from taggit.managers import TaggableManager
 from PIL import Image
 import uuid
 import os
+import re
+from django.utils.html import strip_tags
 
 # Get Azure Storage instance
 # def get_azure_storage():
@@ -54,8 +56,7 @@ class Post(models.Model):
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
-    excerpt = models.TextField(max_length=300, blank=True, help_text='Brief description of the post')
-    content = models.TextField()
+    content = RichTextField(help_text='เนื้อหาบทความ')
     featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True)
     featured_image_alt = models.CharField(max_length=200, blank=True, help_text='Alt text for featured image')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
@@ -126,8 +127,34 @@ class Post(models.Model):
         return reverse('blog:post_detail', kwargs={'slug': self.slug})
     
     def get_reading_time(self):
-        word_count = len(self.content.split())
+        # Strip HTML tags for word count
+        plain_text = strip_tags(self.content)
+        word_count = len(plain_text.split())
         return max(1, round(word_count / 200))
+    
+    def get_excerpt(self):
+        """Generate excerpt automatically from content"""
+        # Remove HTML tags
+        plain_text = strip_tags(self.content)
+        
+        # Clean up text
+        plain_text = re.sub(r'\s+', ' ', plain_text).strip()
+        
+        # Get first 150 characters for excerpt
+        if len(plain_text) > 150:
+            # Try to break at sentence end
+            excerpt = plain_text[:150]
+            last_sentence = excerpt.rfind('.')
+            last_space = excerpt.rfind(' ')
+            
+            if last_sentence > 100:
+                return excerpt[:last_sentence + 1]
+            elif last_space > 100:
+                return excerpt[:last_space] + '...'
+            else:
+                return excerpt + '...'
+        
+        return plain_text
 
 
 

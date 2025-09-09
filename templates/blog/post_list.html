@@ -121,7 +121,7 @@
                     </h3>
                     
                     <p class="text-gray-600 mb-4 flex-grow line-clamp-3">
-                        {{ post.excerpt|default:post.content|striptags|truncatechars:120 }}
+                        {{ post.get_excerpt|truncatechars:120 }}
                     </p>
                     
                     {% if post.tags.all %}
@@ -216,7 +216,7 @@
                                     </h3>
                                     
                                     <p class="text-gray-600 mb-4">
-                                        {{ post.excerpt|default:post.content|striptags|truncatechars:150 }}
+                                        {{ post.get_excerpt|truncatechars:150 }}
                                     </p>
                                     
                                     <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
