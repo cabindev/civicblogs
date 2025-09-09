@@ -195,13 +195,20 @@ try:
             AZURE_STORAGE_CONNECTION_STRING = AZURE_CONNECTION_STRING
             AZURE_CONTAINER = config('AZURE_STORAGE_CONTAINER_NAME', default='media')
             
-            # Use Azure Blob Storage for media files
-            DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-            
             # Extract account name for URL
             AZURE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME')
             AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
             MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
+            
+            # Use modern Django STORAGES setting (Django 4.2+)
+            STORAGES = {
+                "default": {
+                    "BACKEND": "storages.backends.azure_storage.AzureStorage",
+                },
+                "staticfiles": {
+                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                },
+            }
             
             print(f"✅ Azure Blob Storage configured with Connection String: {MEDIA_URL}")
         else:
@@ -210,14 +217,41 @@ try:
             AZURE_ACCOUNT_KEY = config('AZURE_STORAGE_ACCOUNT_KEY')
             AZURE_CONTAINER = config('AZURE_STORAGE_CONTAINER_NAME', default='media')
             
-            DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
             AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
             MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
             
+            # Use modern Django STORAGES setting (Django 4.2+)
+            STORAGES = {
+                "default": {
+                    "BACKEND": "storages.backends.azure_storage.AzureStorage",
+                },
+                "staticfiles": {
+                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                },
+            }
+            
             print(f"✅ Azure Blob Storage configured with Account Key: {MEDIA_URL}")
+    else:
+        # Local storage fallback
+        STORAGES = {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
 except Exception as e:
     print(f"⚠️  Azure Blob Storage configuration failed: {e}")
     # Fallback to local storage
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 # Security settings for production
 if not DEBUG:
