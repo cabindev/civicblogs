@@ -100,16 +100,27 @@ class Post(models.Model):
             # Ensure slug is not empty and is valid
             self.slug = slugify(slug_text) or f"post-{self.id or 'new'}"
         
-        # Optimize featured image
         super().save(*args, **kwargs)
         
+        # Only optimize image if using local file storage (not cloud storage)
         if self.featured_image:
-            img = Image.open(self.featured_image.path)
-            
-            # Resize image if it's larger than 1200x800
-            if img.height > 800 or img.width > 1200:
-                img.thumbnail((1200, 800), Image.Resampling.LANCZOS)
-                img.save(self.featured_image.path, optimize=True, quality=85)
+            try:
+                from django.core.files.storage import default_storage
+                # Check if we're using local file storage (FileSystemStorage)
+                if 'FileSystemStorage' in str(default_storage.__class__):
+                    img = Image.open(self.featured_image.path)
+                    
+                    # Resize image if it's larger than 1200x800
+                    if img.height > 800 or img.width > 1200:
+                        img.thumbnail((1200, 800), Image.Resampling.LANCZOS)
+                        img.save(self.featured_image.path, optimize=True, quality=85)
+                else:
+                    # Skip image optimization for cloud storage (Azure, S3, etc.)
+                    print(f"Skipping image optimization for {default_storage.__class__.__name__}")
+            except Exception as e:
+                # Don't fail the save if image optimization fails
+                print(f"Image optimization skipped due to error: {e}")
+                pass
     
     def get_absolute_url(self):
         return reverse('blog:post_detail', kwargs={'slug': self.slug})
