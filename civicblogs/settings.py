@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'csp',
     'taggit',
     # 'ckeditor',
     # 'ckeditor_uploader',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
+    'csp.middleware.CSPMiddleware',  # Content Security Policy
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -254,18 +256,52 @@ except Exception as e:
 
 # Security settings for production
 if not DEBUG:
+    # HTTPS and SSL settings
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_PRELOAD = True
     SECURE_REDIRECT_EXEMPT = []
     # Disable SSL redirect for Azure App Service (Azure handles SSL termination)
     SECURE_SSL_REDIRECT = False
     # Azure App Service proxy headers
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Cookie security
     SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    
+    # Content security
     X_FRAME_OPTIONS = 'DENY'
+    SECURE_REFERRER_POLICY = 'same-origin'
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+    
+    # Content Security Policy
+    CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'https:')
+    CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", 
+                      'https://cdn.tailwindcss.com',
+                      'https://cdnjs.cloudflare.com',
+                      'https://fonts.googleapis.com')
+    CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",
+                     'https://cdn.tailwindcss.com',
+                     'https://cdnjs.cloudflare.com',
+                     'https://fonts.googleapis.com',
+                     'https://fonts.gstatic.com')
+    CSP_FONT_SRC = ("'self'",
+                    'https://fonts.gstatic.com',
+                    'https://cdnjs.cloudflare.com')
+    CSP_IMG_SRC = ("'self'", 'data:', 'https:', 'http:')
+    CSP_CONNECT_SRC = ("'self'",)
+else:
+    # Development security settings (more lenient)
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

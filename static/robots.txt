@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /static/admin/
+Disallow: /media/private/
+
+# Allow public media
+Allow: /media/blog/
+Allow: /static/
+
+# Crawl delay
+Crawl-delay: 1

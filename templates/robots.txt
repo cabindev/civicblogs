@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: {{ request.build_absolute_uri }}sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /static/admin/
+Disallow: /media/private/
+
+# Allow public media
+Allow: /media/blog/
+Allow: /static/
+
+# Crawl delay
+Crawl-delay: 1
