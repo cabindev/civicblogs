@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&family=Poppins:wght@100;200;300;400;500;600;700&family=Prompt:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&family=Geist+Mono:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@100;200;300;400;500;600;700;800;900&family=Sarabun:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -45,9 +45,10 @@
                         }
                     },
                     fontFamily: {
-                        'sans': ['Inter', 'Prompt', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        'display': ['Poppins', 'Prompt', 'system-ui', 'sans-serif'],
-                        'thai': ['Prompt', 'Sarabun', 'system-ui', 'sans-serif'],
+                        'sans': ['Geist', 'Noto Sans Thai', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        'display': ['Geist', 'Noto Sans Thai', 'system-ui', 'sans-serif'],
+                        'thai': ['Noto Sans Thai', 'Sarabun', 'system-ui', 'sans-serif'],
+                        'mono': ['Geist Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', 'monospace'],
                     },
                     fontWeight: {
                         thin: '100',
@@ -142,13 +143,13 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-1">
                     <a href="{% url 'blog:post_list' %}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-home mr-2"></i>หน้าแรก
+                        หน้าแรก
                     </a>
                     
                     <!-- Categories Dropdown -->
                     <div class="relative group">
                         <button class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200 flex items-center">
-                            <i class="fas fa-folder mr-2"></i>หมวดหมู่
+                            หมวดหมู่
                             <i class="fas fa-chevron-down ml-1 text-xs"></i>
                         </button>
                         <div class="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -165,10 +166,10 @@
                     </div>
                     
                     <a href="{% url 'blog:about' %}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-info-circle mr-2"></i>เกี่ยวกับ
+                        เกี่ยวกับ
                     </a>
                     <a href="{% url 'blog:contact' %}" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-envelope mr-2"></i>ติดต่อ
+                        ติดต่อ
                     </a>
                 </div>
 
@@ -244,13 +245,13 @@
                 </form>
 
                 <a href="{% url 'blog:post_list' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
-                    <i class="fas fa-home mr-2"></i>หน้าแรก
+                    หน้าแรก
                 </a>
                 
                 <!-- Mobile Categories -->
                 <div class="space-y-1">
-                    <p class="px-3 py-2 text-sm font-medium text-gray-500 flex items-center">
-                        <i class="fas fa-folder mr-2"></i>หมวดหมู่
+                    <p class="px-3 py-2 text-sm font-medium text-gray-500">
+                        หมวดหมู่
                     </p>
                     {% for category in global_categories %}
                     <a href="{% url 'blog:category_detail' category.slug %}" class="block px-6 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
@@ -262,10 +263,10 @@
                 </div>
                 
                 <a href="{% url 'blog:about' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
-                    <i class="fas fa-info-circle mr-2"></i>เกี่ยวกับ
+                    เกี่ยวกับ
                 </a>
                 <a href="{% url 'blog:contact' %}" class="block px-3 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600 rounded-lg">
-                    <i class="fas fa-envelope mr-2"></i>ติดต่อ
+                    ติดต่อ
                 </a>
             </div>
         </div>
@@ -311,29 +312,6 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Newsletter Section -->
-    {% block newsletter %}
-    <section class="bg-gradient-to-r from-yellow-50 to-yellow-100 py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-2xl mx-auto text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-6">
-                    <i class="fas fa-envelope-open-text text-white text-xl"></i>
-                </div>
-                <h2 class="text-3xl font-normal text-gray-900 mb-4">รับข้อมูลข่าวสารล่าสุด</h2>
-                <p class="text-gray-600 mb-8">สมัครรับข้อมูลข่าวสารและบทความเกี่ยวกับการขับเคลื่อนงานแก้ไขปัญหาแอลกอฮอล์</p>
-                
-                <form method="post" action="#" class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                    {% csrf_token %}
-                    <input type="email" name="email" placeholder="กรอกอีเมลของคุณ..." required
-                           class="flex-1 px-6 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
-                    <button type="submit" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-xl transition-colors duration-200">
-                        <i class="fas fa-paper-plane mr-2"></i>สมัครรับข่าวสาร
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
-    {% endblock %}
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white">
