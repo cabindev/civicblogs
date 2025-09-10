@@ -49,3 +49,4 @@ websockets==15.0.1
 gunicorn==23.0.0
 whitenoise==6.8.2
 django-csp==3.8
+djangorestframework==3.15.2
