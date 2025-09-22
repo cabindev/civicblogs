@@ -6,7 +6,11 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from taggit.models import Tag
-from .models import Post, Category, Newsletter, ContactMessage, Video
+from .models import Post, Category, Newsletter, ContactMessage
+try:
+    from .models import Video
+except ImportError:
+    Video = None
 from .forms import ContactForm, NewsletterForm
 
 
@@ -27,10 +31,13 @@ class PostListView(ListView):
         ).filter(post_count__gt=0).order_by('-post_count')[:10]
         
         # Add latest videos to homepage (with error handling)
-        try:
-            context['latest_videos'] = Video.objects.filter(status='published').select_related('author', 'category').order_by('-created_at')[:6]
-        except Exception:
-            # If Video model doesn't exist yet (migrations not run), use empty list
+        if Video is not None:
+            try:
+                context['latest_videos'] = Video.objects.filter(status='published').select_related('author', 'category').order_by('-created_at')[:6]
+            except Exception:
+                # If Video table doesn't exist yet (migrations not run), use empty list
+                context['latest_videos'] = []
+        else:
             context['latest_videos'] = []
         
         return context
@@ -59,27 +66,33 @@ class PostDetailView(DetailView):
         return context
 
 
-class VideoDetailView(DetailView):
-    model = Video
-    template_name = 'blog/video_detail.html'
-    context_object_name = 'video'
-    
-    def get_queryset(self):
-        return Video.objects.filter(status='published').select_related('author', 'category')
-    
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        obj.view_count += 1
-        obj.save(update_fields=['view_count'])
-        return obj
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['related_videos'] = Video.objects.filter(
-            category=self.object.category,
-            status='published'
-        ).exclude(id=self.object.id)[:3]
-        return context
+if Video is not None:
+    class VideoDetailView(DetailView):
+        model = Video
+        template_name = 'blog/video_detail.html'
+        context_object_name = 'video'
+        
+        def get_queryset(self):
+            return Video.objects.filter(status='published').select_related('author', 'category')
+        
+        def get_object(self, queryset=None):
+            obj = super().get_object(queryset)
+            obj.view_count += 1
+            obj.save(update_fields=['view_count'])
+            return obj
+        
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['related_videos'] = Video.objects.filter(
+                category=self.object.category,
+                status='published'
+            ).exclude(id=self.object.id)[:3]
+            return context
+else:
+    # Dummy view when Video model doesn't exist
+    class VideoDetailView(DetailView):
+        def get(self, request, *args, **kwargs):
+            return HttpResponse("Video feature not available", status=404)
 
 
 class CategoryDetailView(DetailView):
