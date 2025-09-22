@@ -4,8 +4,12 @@ from django.urls import reverse
 from django.utils import timezone
 from .models import Post, Category, Newsletter, ContactMessage, Video
 
-# Import Social Media Admin
-from .social_admin import SocialPostAdmin, PostAnalyticsSummaryAdmin
+# Import Social Media Admin (with error handling)
+try:
+    from .social_admin import SocialPostAdmin, PostAnalyticsSummaryAdmin
+except ImportError:
+    SocialPostAdmin = None
+    PostAnalyticsSummaryAdmin = None
 
 
 @admin.register(Category)

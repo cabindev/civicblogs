@@ -9,8 +9,12 @@ import uuid
 import os
 import re
 
-# Import Social Media models
-from .social_models import SocialPost, PostAnalyticsSummary
+# Import Social Media models (with error handling)
+try:
+    from .social_models import SocialPost, PostAnalyticsSummary
+except ImportError:
+    SocialPost = None
+    PostAnalyticsSummary = None
 from django.utils.html import strip_tags
 
 # Get Azure Storage instance
