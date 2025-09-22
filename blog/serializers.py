@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Category
+from .models import Post, Category, Video
 from taggit.models import Tag
 
 
@@ -87,4 +87,53 @@ class PostDetailSerializer(serializers.ModelSerializer):
             if request:
                 return request.build_absolute_uri(obj.featured_image.url)
             return obj.featured_image.url
+        return None
+
+class VideoListSerializer(serializers.ModelSerializer):
+    """Serializer for Video list view (lighter data)"""
+    author = serializers.StringRelatedField()
+    category = CategorySerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    thumbnail_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Video
+        fields = [
+            'id', 'title', 'slug', 'description', 'video_url', 'author', 
+            'category', 'tags', 'thumbnail_url', 'thumbnail_alt',
+            'created_at', 'updated_at', 'view_count', 'status'
+        ]
+    
+    def get_thumbnail_url(self, obj):
+        """Get full URL for video thumbnail"""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
+        return None
+
+
+class VideoDetailSerializer(serializers.ModelSerializer):
+    """Serializer for Video detail view (full data)"""
+    author = serializers.StringRelatedField()
+    category = CategorySerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    thumbnail_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Video
+        fields = [
+            'id', 'title', 'slug', 'description', 'video_url', 'author', 
+            'category', 'tags', 'thumbnail_url', 'thumbnail_alt',
+            'created_at', 'updated_at', 'view_count', 'status'
+        ]
+    
+    def get_thumbnail_url(self, obj):
+        """Get full URL for video thumbnail"""
+        if obj.thumbnail:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.thumbnail.url)
+            return obj.thumbnail.url
         return None

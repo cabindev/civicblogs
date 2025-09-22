@@ -8,6 +8,9 @@ from PIL import Image
 import uuid
 import os
 import re
+
+# Import Social Media models
+from .social_models import SocialPost, PostAnalyticsSummary
 from django.utils.html import strip_tags
 
 # Get Azure Storage instance
@@ -43,6 +46,12 @@ def upload_featured_image(instance, filename):
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
     return os.path.join('blog/featured_images', filename)
+
+
+def upload_video_thumbnail(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+    return os.path.join('blog/video_thumbnails', filename)
 
 
 class Post(models.Model):
@@ -156,6 +165,76 @@ class Post(models.Model):
         
         return plain_text
 
+
+class Video(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+        ('archived', 'Archived'),
+    )
+    
+    title = models.CharField(max_length=200, help_text='ชื่อวิดีโอ')
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    description = models.TextField(blank=True, help_text='คำอธิบายวิดีโอ')
+    video_url = models.URLField(help_text='ลิงก์วิดีโอ เช่น https://www.facebook.com/reel/791446180047418')
+    thumbnail = models.ImageField(upload_to=upload_video_thumbnail, blank=True, null=True, help_text='รูปปกวิดีโอ')
+    thumbnail_alt = models.CharField(max_length=200, blank=True, help_text='Alt text สำหรับรูปปก')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='videos')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='videos')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    tags = TaggableManager(blank=True)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    
+    # Analytics
+    view_count = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['status']),
+            models.Index(fields=['category']),
+        ]
+    
+    def __str__(self):
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # For Thai text, create a simple slug from title
+            import re
+            from django.utils import timezone
+            
+            slug_text = self.title.lower()
+            # Remove Thai characters and keep only English and numbers
+            slug_text = re.sub(r'[^\w\s-]', '', slug_text)
+            slug_text = re.sub(r'[-\s]+', '-', slug_text)
+            
+            # If no English characters, use a generic slug with timestamp
+            if not slug_text or slug_text == '-':
+                timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+                slug_text = f"video-{timestamp}"
+            
+            # Make sure slug is unique
+            base_slug = slugify(slug_text) or f"video-{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            slug = base_slug
+            counter = 1
+            
+            # Check if slug exists and make it unique
+            while Video.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            self.slug = slug
+        
+        super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('blog:video_detail', kwargs={'slug': self.slug})
 
 
 class Newsletter(models.Model):

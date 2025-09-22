@@ -58,7 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
-    'csp.middleware.CSPMiddleware',  # Content Security Policy
+] + (['csp.middleware.CSPMiddleware'] if not DEBUG else []) + [  # Only add CSP in production
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -180,20 +180,17 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise configuration for efficient static file serving
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default STORAGES setting (required for Django 4.2+)
+# STORAGES setting (required for Django 4.2+)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
@@ -306,6 +303,26 @@ else:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'SAMEORIGIN'
+    
+    # Development CSP settings (more permissive)
+    CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", 'https:', 'data:', '*')
+    CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", 
+                      'https://cdn.tailwindcss.com',
+                      'https://cdnjs.cloudflare.com',
+                      'https://fonts.googleapis.com',
+                      'https://fonts.gstatic.com')
+    CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",
+                     'https://cdn.tailwindcss.com',
+                     'https://cdnjs.cloudflare.com',
+                     'https://fonts.googleapis.com',
+                     'https://fonts.gstatic.com')
+    CSP_FONT_SRC = ("'self'", 'data:',
+                    'https://fonts.gstatic.com',
+                    'https://cdnjs.cloudflare.com')
+    CSP_IMG_SRC = ("'self'", 'data:', 'https:', 'http:', 'blob:', '*')
+    CSP_CONNECT_SRC = ("'self'", 'https:', '*')
+    CSP_FRAME_SRC = ("'self'", '*')
+    CSP_MEDIA_SRC = ("'self'", 'https:', 'data:', '*')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

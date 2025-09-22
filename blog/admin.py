@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
-from .models import Post, Category, Newsletter, ContactMessage
+from .models import Post, Category, Newsletter, ContactMessage, Video
+
+# Import Social Media Admin
+from .social_admin import SocialPostAdmin, PostAnalyticsSummaryAdmin
 
 
 @admin.register(Category)
@@ -83,6 +86,61 @@ class PostAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related('author', 'category')
 
 
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ['title', 'author', 'category', 'status', 'view_count', 'created_at', 'published_at']
+    list_filter = ['status', 'created_at', 'category', 'tags']
+    search_fields = ['title', 'description', 'author__username', 'video_url']
+    date_hierarchy = 'created_at'
+    list_per_page = 25
+    actions = ['mark_as_published', 'mark_as_draft']
+    
+    fieldsets = (
+        ('ข้อมูลพื้นฐาน', {
+            'fields': ('title', 'slug', 'author', 'category', 'status'),
+            'description': 'Slug สามารถเว้นว่างได้ (ระบบจะสร้างให้อัตโนมัติ)'
+        }),
+        ('วิดีโอ', {
+            'fields': ('video_url', 'description')
+        }),
+        ('รูปภาพ', {
+            'fields': ('thumbnail', 'thumbnail_alt')
+        }),
+        ('แท็ก', {
+            'fields': ('tags',)
+        }),
+        ('การเผยแพร่', {
+            'fields': ('published_at',)
+        }),
+    )
+    
+    def mark_as_published(self, request, queryset):
+        from django.utils import timezone
+        updated = 0
+        for video in queryset:
+            video.status = 'published'
+            if not video.published_at:
+                video.published_at = timezone.now()
+            video.save()
+            updated += 1
+        self.message_user(request, f'{updated} วิดีโอได้รับการเผยแพร่แล้ว')
+    mark_as_published.short_description = "เผยแพร่วิดีโอที่เลือก"
+    
+    def mark_as_draft(self, request, queryset):
+        queryset.update(status='draft')
+        self.message_user(request, f'{queryset.count()} วิดีโอถูกเปลี่ยนเป็น Draft แล้ว')
+    mark_as_draft.short_description = "เปลี่ยนเป็น Draft"
+    
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.author = request.user
+        if obj.status == 'published' and not obj.published_at:
+            obj.published_at = timezone.now()
+        
+        super().save_model(request, obj, form, change)
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('author', 'category')
 
 
 @admin.register(Newsletter)

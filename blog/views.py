@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from taggit.models import Tag
-from .models import Post, Category, Newsletter, ContactMessage
+from .models import Post, Category, Newsletter, ContactMessage, Video
 from .forms import ContactForm, NewsletterForm
 
 
@@ -25,6 +25,8 @@ class PostListView(ListView):
         context['popular_tags'] = Tag.objects.annotate(
             post_count=Count('taggit_taggeditem_items')
         ).filter(post_count__gt=0).order_by('-post_count')[:10]
+        # Add latest videos to homepage
+        context['latest_videos'] = Video.objects.filter(status='published').select_related('author', 'category').order_by('-created_at')[:6]
         return context
 
 
@@ -45,6 +47,29 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['related_posts'] = Post.objects.filter(
+            category=self.object.category,
+            status='published'
+        ).exclude(id=self.object.id)[:3]
+        return context
+
+
+class VideoDetailView(DetailView):
+    model = Video
+    template_name = 'blog/video_detail.html'
+    context_object_name = 'video'
+    
+    def get_queryset(self):
+        return Video.objects.filter(status='published').select_related('author', 'category')
+    
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.view_count += 1
+        obj.save(update_fields=['view_count'])
+        return obj
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['related_videos'] = Video.objects.filter(
             category=self.object.category,
             status='published'
         ).exclude(id=self.object.id)[:3]
