@@ -21,24 +21,35 @@ class PostListView(ListView):
     paginate_by = 12
     
     def get_queryset(self):
-        return Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags')
+        try:
+            return Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags')
+        except Exception:
+            return Post.objects.none()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.annotate(post_count=Count('posts')).filter(post_count__gt=0)
-        context['popular_tags'] = Tag.objects.annotate(
-            post_count=Count('taggit_taggeditem_items')
-        ).filter(post_count__gt=0).order_by('-post_count')[:10]
         
-        # Add latest videos to homepage (with error handling)
+        # Safe category loading
+        try:
+            context['categories'] = Category.objects.annotate(post_count=Count('posts')).filter(post_count__gt=0)
+        except Exception:
+            context['categories'] = []
+        
+        # Safe tag loading  
+        try:
+            context['popular_tags'] = Tag.objects.annotate(
+                post_count=Count('taggit_taggeditem_items')
+            ).filter(post_count__gt=0).order_by('-post_count')[:10]
+        except Exception:
+            context['popular_tags'] = []
+        
+        # Safe video loading
+        context['latest_videos'] = []
         if Video is not None:
             try:
                 context['latest_videos'] = Video.objects.filter(status='published').select_related('author', 'category').order_by('-created_at')[:6]
             except Exception:
-                # If Video table doesn't exist yet (migrations not run), use empty list
-                context['latest_videos'] = []
-        else:
-            context['latest_videos'] = []
+                pass
         
         return context
 
