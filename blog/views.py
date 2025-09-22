@@ -25,8 +25,14 @@ class PostListView(ListView):
         context['popular_tags'] = Tag.objects.annotate(
             post_count=Count('taggit_taggeditem_items')
         ).filter(post_count__gt=0).order_by('-post_count')[:10]
-        # Add latest videos to homepage
-        context['latest_videos'] = Video.objects.filter(status='published').select_related('author', 'category').order_by('-created_at')[:6]
+        
+        # Add latest videos to homepage (with error handling)
+        try:
+            context['latest_videos'] = Video.objects.filter(status='published').select_related('author', 'category').order_by('-created_at')[:6]
+        except Exception:
+            # If Video model doesn't exist yet (migrations not run), use empty list
+            context['latest_videos'] = []
+        
         return context
 
 
