@@ -242,11 +242,15 @@ def facebook_analysis(request):
         </div>
 
         <script>
+        // Global chart variables
+        let sentimentChart;
+        let timelineChart;
+        
         // Sample Chart Implementation
         document.addEventListener('DOMContentLoaded', function() {
             // Sentiment Pie Chart
             const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
-            new Chart(sentimentCtx, {
+            sentimentChart = new Chart(sentimentCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Positive', 'Neutral', 'Negative'],
@@ -267,7 +271,7 @@ def facebook_analysis(request):
 
             // Timeline Chart
             const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-            new Chart(timelineCtx, {
+            timelineChart = new Chart(timelineCtx, {
                 type: 'line',
                 data: {
                     labels: ['6:00', '12:00', '18:00', '24:00'],
@@ -316,15 +320,22 @@ def facebook_analysis(request):
                         })
                     });
                     
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
                     const result = await response.json();
                     
                     if (result.success) {
                         updateAnalysisResults(result.data);
+                        alert('✅ วิเคราะห์เสร็จแล้ว! ดูผลลัพธ์ด้านล่าง');
                     } else {
-                        alert('เกิดข้อผิดพลาด: ' + result.error);
+                        alert('❌ เกิดข้อผิดพลาด: ' + (result.error || 'ไม่ทราบสาเหตุ'));
                     }
                 } catch (error) {
-                    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error.message);
+                    console.error('Analysis error:', error);
+                    alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error.message + 
+                          '\\n\\n💡 ลองรีเฟรชหน้าและทำใหม่อีกครั้ง');
                 } finally {
                     // Reset button
                     submitBtn.innerHTML = originalText;
@@ -394,9 +405,24 @@ def facebook_analysis(request):
             }
             
             function updateCharts(percentages) {
-                // Update sentiment chart
-                sentimentChart.data.datasets[0].data = [percentages.positive, percentages.neutral, percentages.negative];
-                sentimentChart.update();
+                // Update sentiment chart safely
+                if (sentimentChart && sentimentChart.data && sentimentChart.data.datasets && sentimentChart.data.datasets[0]) {
+                    sentimentChart.data.datasets[0].data = [percentages.positive, percentages.neutral, percentages.negative];
+                    sentimentChart.update();
+                }
+                
+                // Update timeline chart with sample engagement data
+                if (timelineChart && timelineChart.data && timelineChart.data.datasets && timelineChart.data.datasets[0]) {
+                    // Generate sample hourly engagement based on sentiment
+                    const baseEngagement = Math.floor(percentages.positive / 10);
+                    timelineChart.data.datasets[0].data = [
+                        baseEngagement + Math.floor(Math.random() * 5),
+                        baseEngagement + Math.floor(Math.random() * 8) + 5,
+                        baseEngagement + Math.floor(Math.random() * 6) + 2,
+                        baseEngagement + Math.floor(Math.random() * 3)
+                    ];
+                    timelineChart.update();
+                }
             }
             
             function updateInsights(analysis) {
