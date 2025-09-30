@@ -46,6 +46,29 @@ class Category(models.Model):
         return reverse('blog:category_detail', kwargs={'slug': self.slug})
 
 
+class PostType(models.Model):
+    """Model to define different types of posts like infographic, news, website, etc."""
+    name = models.CharField(max_length=50, unique=True, verbose_name="ชื่อประเภท")
+    slug = models.SlugField(max_length=50, unique=True, blank=True)
+    description = models.TextField(blank=True, verbose_name="คำอธิบาย")
+    icon = models.CharField(max_length=20, blank=True, help_text="CSS icon class or emoji", verbose_name="ไอคอน")
+    color = models.CharField(max_length=7, default="#3B82F6", help_text="Hex color code", verbose_name="สีประจำประเภท")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'ประเภทโพสต์'
+        verbose_name_plural = 'ประเภทโพสต์'
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 def upload_featured_image(instance, filename):
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
@@ -69,6 +92,7 @@ class Post(models.Model):
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
+    post_type = models.ForeignKey(PostType, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts', verbose_name="ประเภทโพสต์")
     content = RichTextUploadingField(help_text='เนื้อหาบทความ - รองรับการอัปโหลดรูปภาพ')
     featured_image = models.ImageField(upload_to=upload_featured_image, blank=True, null=True)
     featured_image_alt = models.CharField(max_length=200, blank=True, help_text='Alt text for featured image')

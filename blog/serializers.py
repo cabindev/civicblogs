@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Category, Video
+from .models import Post, Category, PostType, Video
 from taggit.models import Tag
 
 
@@ -16,6 +16,19 @@ class CategorySerializer(serializers.ModelSerializer):
         return obj.posts.filter(status='published').count()
 
 
+class PostTypeSerializer(serializers.ModelSerializer):
+    """Serializer for PostType model"""
+    post_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PostType
+        fields = ['id', 'name', 'slug', 'description', 'icon', 'color', 'post_count']
+    
+    def get_post_count(self, obj):
+        """Get published post count for this post type"""
+        return obj.posts.filter(status='published').count()
+
+
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for Tag model"""
     
@@ -28,6 +41,7 @@ class PostListSerializer(serializers.ModelSerializer):
     """Serializer for Post list view (lighter data)"""
     author = serializers.StringRelatedField()
     category = CategorySerializer(read_only=True)
+    post_type = PostTypeSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     excerpt = serializers.SerializerMethodField()
     reading_time = serializers.SerializerMethodField()
@@ -36,7 +50,7 @@ class PostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'slug', 'excerpt', 'author', 'category', 
+            'id', 'title', 'slug', 'excerpt', 'author', 'category', 'post_type',
             'tags', 'featured_image_url', 'created_at', 'updated_at', 
             'view_count', 'reading_time', 'status'
         ]
@@ -63,6 +77,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     """Serializer for Post detail view (full data)"""
     author = serializers.StringRelatedField()
     category = CategorySerializer(read_only=True)
+    post_type = PostTypeSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     reading_time = serializers.SerializerMethodField()
     featured_image_url = serializers.SerializerMethodField()
@@ -70,7 +85,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'slug', 'content', 'author', 'category', 
+            'id', 'title', 'slug', 'content', 'author', 'category', 'post_type',
             'tags', 'featured_image_url', 'featured_image_alt',
             'meta_description', 'meta_keywords', 'created_at', 
             'updated_at', 'view_count', 'reading_time', 'status'

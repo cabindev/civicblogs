@@ -2,9 +2,10 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Post, Category, Video
+from .models import Post, Category, PostType, Video
 from .serializers import (
     CategorySerializer,
+    PostTypeSerializer,
     TagSerializer,
     PostListSerializer,
     PostDetailSerializer,
@@ -22,15 +23,24 @@ class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
+class PostTypeListView(generics.ListAPIView):
+    """
+    API view to list all post types with post counts
+    """
+    queryset = PostType.objects.all().order_by('name')
+    serializer_class = PostTypeSerializer
+
+
 class PostListView(generics.ListAPIView):
     """
     API view to list published posts with pagination
     Supports search by title, content, and category
     """
     serializer_class = PostListSerializer
+    pagination_class = None  # Disable pagination temporarily for Next.js compatibility
     
     def get_queryset(self):
-        queryset = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags')
+        queryset = Post.objects.filter(status='published').select_related('author', 'category', 'post_type').prefetch_related('tags')
         
         # Search functionality
         search = self.request.query_params.get('search', None)
@@ -59,7 +69,7 @@ class PostDetailView(generics.RetrieveAPIView):
     API view to retrieve a single post by slug
     Also increments view count
     """
-    queryset = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags')
+    queryset = Post.objects.filter(status='published').select_related('author', 'category', 'post_type').prefetch_related('tags')
     serializer_class = PostDetailSerializer
     lookup_field = 'slug'
     
@@ -100,7 +110,7 @@ def posts_by_category(request, category_slug):
         posts = Post.objects.filter(
             category=category,
             status='published'
-        ).select_related('author', 'category').prefetch_related('tags').order_by('-created_at')
+        ).select_related('author', 'category', 'post_type').prefetch_related('tags').order_by('-created_at')
         
         serializer = PostListSerializer(posts, many=True, context={'request': request})
         
@@ -122,7 +132,7 @@ def posts_by_tag(request, tag_slug):
         posts = Post.objects.filter(
             tags=tag,
             status='published'
-        ).select_related('author', 'category').prefetch_related('tags').order_by('-created_at')
+        ).select_related('author', 'category', 'post_type').prefetch_related('tags').order_by('-created_at')
         
         serializer = PostListSerializer(posts, many=True, context={'request': request})
         
@@ -140,7 +150,7 @@ def latest_posts(request):
     API endpoint to get latest published posts
     """
     limit = int(request.query_params.get('limit', 10))
-    posts = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags').order_by('-created_at')[:limit]
+    posts = Post.objects.filter(status='published').select_related('author', 'category', 'post_type').prefetch_related('tags').order_by('-created_at')[:limit]
     
     serializer = PostListSerializer(posts, many=True, context={'request': request})
     return Response(serializer.data)
@@ -152,7 +162,7 @@ def popular_posts(request):
     API endpoint to get most popular posts by view count
     """
     limit = int(request.query_params.get('limit', 10))
-    posts = Post.objects.filter(status='published').select_related('author', 'category').prefetch_related('tags').order_by('-view_count')[:limit]
+    posts = Post.objects.filter(status='published').select_related('author', 'category', 'post_type').prefetch_related('tags').order_by('-view_count')[:limit]
     
     serializer = PostListSerializer(posts, many=True, context={'request': request})
     return Response(serializer.data)

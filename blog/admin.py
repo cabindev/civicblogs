@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
-from .models import Post, Category, Newsletter, ContactMessage, Video
+from .models import Post, Category, PostType, Newsletter, ContactMessage, Video
 
 # Import Social Media Admin (with error handling)
 try:
@@ -23,10 +23,22 @@ class CategoryAdmin(admin.ModelAdmin):
     post_count.short_description = 'Posts'
 
 
+@admin.register(PostType)
+class PostTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'description', 'icon', 'color', 'post_count', 'created_at']
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ['name', 'description']
+    list_filter = ['created_at']
+    
+    def post_count(self, obj):
+        return obj.posts.count()
+    post_count.short_description = 'Posts'
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'category', 'status', 'view_count', 'created_at', 'published_at']
-    list_filter = ['status', 'created_at', 'category', 'tags']
+    list_display = ['get_featured_image_thumbnail', 'title', 'author', 'category', 'post_type', 'status', 'view_count', 'created_at', 'published_at']
+    list_filter = ['status', 'created_at', 'category', 'post_type', 'tags']
     search_fields = ['title', 'content', 'author__username']
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'created_at'
@@ -35,7 +47,7 @@ class PostAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('ข้อมูลพื้นฐาน', {
-            'fields': ('title', 'slug', 'author', 'category', 'status')
+            'fields': ('title', 'slug', 'author', 'category', 'post_type', 'status')
         }),
         ('เนื้อหา', {
             'fields': ('content',)
@@ -88,6 +100,19 @@ class PostAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('author', 'category')
+    
+    def get_featured_image_thumbnail(self, obj):
+        """Display small thumbnail of featured image in admin list"""
+        if obj.featured_image:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />',
+                obj.featured_image.url
+            )
+        return format_html(
+            '<div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; text-align: center;">No<br>Image</div>'
+        )
+    get_featured_image_thumbnail.short_description = 'รูปภาพ'
+    get_featured_image_thumbnail.allow_tags = True
 
 
 @admin.register(Video)

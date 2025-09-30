@@ -9,9 +9,15 @@ from collections import Counter
 import json
 
 class ThaiSentimentAnalyzer:
-    """Thai Sentiment Analysis Class"""
+    """Thai Sentiment Analysis Class - Enhanced Version 2.0"""
     
     def __init__(self):
+        # Negation words for context analysis
+        self.negation_words = {
+            'ไม่', 'ไม่ใช่', 'ไม่เคย', 'ไม่มี', 'ไม่ได้', 'ไม่ต้อง', 'ไม่ควร',
+            'ไม่เอา', 'ไม่อยาก', 'ไม่รู้', 'ไม่เป็น', 'ไม่น่า', 'ไม่แน่',
+            'หยุด', 'เลิก', 'ออก', 'หยุด', 'ปฏิเสธ', 'ผิด', 'ผิดพลาด'
+        }
         # Thai positive words
         self.positive_words = {
             'ดี', 'เก่ง', 'สุดยอด', 'ยอดเยี่ยม', 'เยี่ยม', 'ชอบ', 'รัก', 'สนับสนุน',

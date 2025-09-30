@@ -9,6 +9,9 @@ urlpatterns = [
     path('categories/<slug:slug>/', api_views.CategoryDetailView.as_view(), name='category-detail'),
     path('categories/<slug:category_slug>/posts/', api_views.posts_by_category, name='posts-by-category'),
     
+    # Post Types
+    path('post-types/', api_views.PostTypeListView.as_view(), name='post-type-list'),
+    
     # Tags
     path('tags/', api_views.TagListView.as_view(), name='tag-list'),
     path('tags/<slug:tag_slug>/posts/', api_views.posts_by_tag, name='posts-by-tag'),
