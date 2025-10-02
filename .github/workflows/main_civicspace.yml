@@ -32,15 +32,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
         
-      - name: Collect static files
-        run: |
-          python manage.py collectstatic --noinput
-        env:
-          DEBUG: False
-          USE_POSTGRES: True
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Upload artifact for deployment jobs
@@ -78,4 +69,4 @@ jobs:
           app-name: 'civicspace'
           slot-name: 'Production'
           package: '.'
-          startup-command: 'gunicorn civicblogs.wsgi:application --bind 0.0.0.0:8000 --workers 2'
+          startup-command: 'python deploy.py && gunicorn civicblogs.wsgi:application --bind 0.0.0.0:8000 --workers 2'
