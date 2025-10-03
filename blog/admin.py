@@ -37,35 +37,14 @@ class PostTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['get_featured_image_thumbnail', 'title', 'author', 'category', 'post_type', 'status', 'view_count', 'created_at', 'published_at']
-    list_filter = ['status', 'created_at', 'category', 'post_type', 'tags']
-    search_fields = ['title', 'content', 'author__username']
+    list_display = ['title', 'author', 'category', 'status', 'created_at']
+    list_filter = ['status', 'created_at', 'category']
+    search_fields = ['title', 'author__username']
     prepopulated_fields = {'slug': ('title',)}
-    date_hierarchy = 'created_at'
-    list_per_page = 25
-    actions = ['mark_as_published', 'mark_as_draft', 'delete_selected_posts']
+    list_per_page = 20
+    actions = ['mark_as_published', 'mark_as_draft']
     
-    fieldsets = (
-        ('ข้อมูลพื้นฐาน', {
-            'fields': ('title', 'slug', 'author', 'category', 'post_type', 'status')
-        }),
-        ('เนื้อหา', {
-            'fields': ('content',)
-        }),
-        ('รูปภาพ', {
-            'fields': ('featured_image', 'featured_image_alt')
-        }),
-        ('SEO', {
-            'fields': ('meta_description', 'meta_keywords'),
-            'classes': ('collapse',)
-        }),
-        ('แท็ก', {
-            'fields': ('tags',)
-        }),
-        ('การเผยแพร่', {
-            'fields': ('published_at',)
-        }),
-    )
+    fields = ('title', 'slug', 'author', 'category', 'post_type', 'content', 'featured_image', 'featured_image_alt', 'status', 'tags', 'meta_description', 'published_at')
     
     def mark_as_published(self, request, queryset):
         from django.utils import timezone
@@ -100,24 +79,6 @@ class PostAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('author', 'category')
-    
-    def get_featured_image_thumbnail(self, obj):
-        """Display small thumbnail of featured image in admin list"""
-        if obj.featured_image:
-            try:
-                return format_html(
-                    '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />',
-                    obj.featured_image.url
-                )
-            except Exception as e:
-                return format_html(
-                    '<div style="width: 50px; height: 50px; background: #ffebee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #c62828; text-align: center;">Error<br>Image</div>'
-                )
-        return format_html(
-            '<div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; text-align: center;">No<br>Image</div>'
-        )
-    get_featured_image_thumbnail.short_description = 'รูปภาพ'
-    get_featured_image_thumbnail.allow_tags = True
 
 
 @admin.register(Video)
