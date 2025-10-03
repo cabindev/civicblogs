@@ -575,10 +575,8 @@ urlpatterns = [
     # Debug URLs
     path('test/', test_view, name='test'),
     path('debug/', debug_info, name='debug'),
-    # Temporary simple homepage to bypass blog view errors
-    path('', simple_homepage, name='homepage'),
-    # Commented out problematic blog URLs for now
-    # path('', include('blog.urls')),
+    # Include blog URLs - fixed PostType import issue
+    path('', include('blog.urls')),
 ]
 
 # Serve media files in both development and production

@@ -6,7 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from taggit.models import Tag
-from .models import Post, Category, Newsletter, ContactMessage
+from .models import Post, Category, Newsletter, ContactMessage, PostType
 try:
     from .models import Video
 except ImportError:
