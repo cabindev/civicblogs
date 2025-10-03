@@ -126,17 +126,29 @@ class Post(models.Model):
         if not self.slug:
             # For Thai text, create a simple slug from title
             import re
+            from django.utils import timezone
+            
             slug_text = self.title.lower()
             # Remove Thai characters and keep only English and numbers
             slug_text = re.sub(r'[^\w\s-]', '', slug_text)
             slug_text = re.sub(r'[-\s]+', '-', slug_text)
             
-            # If no English characters, use a generic slug with ID
+            # If no English characters, use a generic slug with timestamp
             if not slug_text or slug_text == '-':
-                slug_text = f"post-{self.id or 'new'}-{self.title[:20]}"
+                timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+                slug_text = f"post-{timestamp}"
             
             # Ensure slug is not empty and is valid
-            self.slug = slugify(slug_text) or f"post-{self.id or 'new'}"
+            base_slug = slugify(slug_text) or f"post-{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            
+            # Check for uniqueness and add number if needed
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            self.slug = slug
         
         super().save(*args, **kwargs)
         

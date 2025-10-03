@@ -27,6 +27,7 @@ class SimplePostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'category', 'post_type', 'content', 'featured_image', 'featured_image_alt', 'status', 'tags', 'meta_description']
+        # Exclude slug field as it will be generated automatically
         widgets = {
             'title': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'ชื่อบทความ'}),
             'category': forms.Select(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md'}),
