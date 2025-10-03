@@ -17,7 +17,7 @@ urlpatterns = [
     path('contact/', views.ContactView.as_view(), name='contact'),
     path('newsletter/subscribe/', views.NewsletterSubscribeView.as_view(), name='newsletter_subscribe'),
     path('about/', views.AboutView.as_view(), name='about'),
-    path('simple-add-post/', views.SimplePostCreateView.as_view(), name='simple_add_post'),
+    # Simple post creation removed - using Django Admin instead
     
     # Social Media Analytics URLs (conditional)
 ] + ([] if social_views is None else [

@@ -23,18 +23,4 @@ class ContactForm(forms.ModelForm):
         }
 
 
-class SimplePostForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ['title', 'category', 'post_type', 'content', 'featured_image', 'featured_image_alt', 'status', 'tags', 'meta_description']
-        # Exclude slug field as it will be generated automatically
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'ชื่อบทความ'}),
-            'category': forms.Select(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md'}),
-            'post_type': forms.Select(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md'}),
-            'content': forms.Textarea(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md', 'rows': 10}),
-            'featured_image': forms.ClearableFileInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md'}),
-            'featured_image_alt': forms.TextInput(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md', 'placeholder': 'คำอธิบายรูปภาพ'}),
-            'status': forms.Select(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md'}),
-            'meta_description': forms.Textarea(attrs={'class': 'w-full px-3 py-2 border border-gray-300 rounded-md', 'rows': 3, 'placeholder': 'คำอธิบายสำหรับ SEO'}),
-        }
+# Simple post form removed - using Django Admin instead

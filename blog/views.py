@@ -11,7 +11,7 @@ try:
     from .models import Video
 except ImportError:
     Video = None
-from .forms import ContactForm, NewsletterForm, SimplePostForm
+from .forms import ContactForm, NewsletterForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -169,29 +169,7 @@ class ContactView(FormView):
         return super().form_valid(form)
 
 
-@method_decorator(login_required, name='dispatch')
-class SimplePostCreateView(FormView):
-    template_name = 'blog/simple_post_create.html'
-    form_class = SimplePostForm
-    success_url = '/simple-add-post/'
-    
-    def form_valid(self, form):
-        try:
-            post = form.save(commit=False)
-            post.author = self.request.user
-            post.save()
-            form.save_m2m()  # Save tags
-            messages.success(self.request, f'✅ บทความ "{post.title}" ถูกสร้างเรียบร้อยแล้ว!')
-            return super().form_valid(form)
-        except Exception as e:
-            messages.error(self.request, f'❌ เกิดข้อผิดพลาด: {str(e)}')
-            return self.form_invalid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
-        context['post_types'] = PostType.objects.all()
-        return context
+# Simple post creation view removed - using Django Admin instead
 
 
 @method_decorator(csrf_exempt, name='dispatch')
