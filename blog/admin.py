@@ -104,10 +104,15 @@ class PostAdmin(admin.ModelAdmin):
     def get_featured_image_thumbnail(self, obj):
         """Display small thumbnail of featured image in admin list"""
         if obj.featured_image:
-            return format_html(
-                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />',
-                obj.featured_image.url
-            )
+            try:
+                return format_html(
+                    '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />',
+                    obj.featured_image.url
+                )
+            except Exception as e:
+                return format_html(
+                    '<div style="width: 50px; height: 50px; background: #ffebee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #c62828; text-align: center;">Error<br>Image</div>'
+                )
         return format_html(
             '<div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; text-align: center;">No<br>Image</div>'
         )
