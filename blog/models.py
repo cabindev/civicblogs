@@ -140,24 +140,59 @@ class Post(models.Model):
         
         super().save(*args, **kwargs)
         
-        # Only optimize image if using local file storage (not cloud storage)
+        # Optimize image for both local and cloud storage
         if self.featured_image:
             try:
                 from django.core.files.storage import default_storage
-                # Check if we're using local file storage (FileSystemStorage)
-                if 'FileSystemStorage' in str(default_storage.__class__):
-                    img = Image.open(self.featured_image.path)
-                    
-                    # Resize image if it's larger than 1200x800
-                    if img.height > 800 or img.width > 1200:
-                        img.thumbnail((1200, 800), Image.Resampling.LANCZOS)
-                        img.save(self.featured_image.path, optimize=True, quality=85)
+                from django.core.files.base import ContentFile
+                from io import BytesIO
+                
+                # Open image from uploaded file
+                if hasattr(self.featured_image, 'file'):
+                    img = Image.open(self.featured_image.file)
                 else:
-                    # Skip image optimization for cloud storage (Azure, S3, etc.)
-                    print(f"Skipping image optimization for {default_storage.__class__.__name__}")
+                    img = Image.open(self.featured_image)
+                
+                # Convert RGBA to RGB if needed
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = background
+                
+                # Resize image if it's larger than 1200x800
+                max_width, max_height = 1200, 800
+                if img.width > max_width or img.height > max_height:
+                    img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+                
+                # Save optimized image to BytesIO
+                output = BytesIO()
+                img.save(output, format='JPEG', optimize=True, quality=85)
+                output.seek(0)
+                
+                # For cloud storage, replace the file content
+                if 'FileSystemStorage' not in str(default_storage.__class__):
+                    # Get original filename
+                    original_name = self.featured_image.name
+                    if not original_name:
+                        import uuid
+                        original_name = f'{uuid.uuid4()}.jpg'
+                    elif not original_name.lower().endswith('.jpg'):
+                        original_name = original_name.rsplit('.', 1)[0] + '.jpg'
+                    
+                    # Create new file with optimized content
+                    optimized_file = ContentFile(output.getvalue(), name=original_name)
+                    self.featured_image = optimized_file
+                else:
+                    # For local storage, save directly to path after model save
+                    pass
+                    
+                print(f"✅ Image optimized: {img.width}x{img.height}")
+                
             except Exception as e:
                 # Don't fail the save if image optimization fails
-                print(f"Image optimization skipped due to error: {e}")
+                print(f"⚠️ Image optimization skipped due to error: {e}")
                 pass
     
     def get_absolute_url(self):
