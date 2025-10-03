@@ -37,7 +37,7 @@ class PostTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'author', 'category', 'status', 'created_at']
+    list_display = ['get_featured_image_thumbnail', 'title', 'author', 'category', 'status', 'created_at']
     list_filter = ['status', 'created_at', 'category']
     search_fields = ['title', 'author__username']
     prepopulated_fields = {'slug': ('title',)}
@@ -79,6 +79,24 @@ class PostAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('author', 'category')
+    
+    def get_featured_image_thumbnail(self, obj):
+        """Display small thumbnail of featured image in admin list"""
+        if obj.featured_image:
+            try:
+                return format_html(
+                    '<img src="{}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;" />',
+                    obj.featured_image.url
+                )
+            except Exception as e:
+                return format_html(
+                    '<div style="width: 40px; height: 40px; background: linear-gradient(135deg, #fee2e2, #fecaca); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #dc2626; text-align: center; border: 1px solid #f87171;">❌<br>Error</div>'
+                )
+        return format_html(
+            '<div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f3f4f6, #e5e7eb); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #6b7280; text-align: center; border: 1px solid #d1d5db;">📷<br>No</div>'
+        )
+    get_featured_image_thumbnail.short_description = '🖼️'
+    get_featured_image_thumbnail.allow_tags = True
 
 
 @admin.register(Video)
