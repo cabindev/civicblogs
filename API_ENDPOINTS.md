@@ -372,6 +372,34 @@ export class CivicBlogsAPI {
     return response.json();
   }
 
+  // Surveys API
+  async getSurveys(params = {}) {
+    const searchParams = new URLSearchParams(params);
+    const response = await fetch(`${this.baseURL}/surveys/?${searchParams}`);
+    return response.json();
+  }
+
+  async getSurvey(slug) {
+    const response = await fetch(`${this.baseURL}/surveys/${slug}/`);
+    return response.json();
+  }
+
+  async getLatestSurveys(limit = 10) {
+    const response = await fetch(`${this.baseURL}/surveys/latest/?limit=${limit}`);
+    return response.json();
+  }
+
+  async getPopularSurveys(limit = 10) {
+    const response = await fetch(`${this.baseURL}/surveys/popular/?limit=${limit}`);
+    return response.json();
+  }
+
+  async getCategorySurveys(slug, params = {}) {
+    const searchParams = new URLSearchParams(params);
+    const response = await fetch(`${this.baseURL}/categories/${slug}/surveys/?${searchParams}`);
+    return response.json();
+  }
+
   // Categories API
   async getCategories() {
     const response = await fetch(`${this.baseURL}/categories/`);
@@ -674,10 +702,83 @@ async getPosts(params = {}) {
 **Production URL**: https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net  
 **Real Data**: ✅ All responses use actual production data  
 
+## Surveys
+
+### GET /api/v1/surveys/
+Get paginated list of all published surveys
+- **Query params:**
+  - `page=2` - Pagination (20 surveys per page)
+  - `search=keyword` - Search in title and description
+  - `category=slug` - Filter by category slug
+
+### GET /api/v1/surveys/{slug}/
+Get single survey by slug (increments view count automatically)
+```json
+{
+  "id": 1,
+  "title": "แบบสำรวจความพึงพอใจในงานบุญเดือนสิบ",
+  "slug": "survey-satisfaction-2025",
+  "description": "แบบสำรวจความพึงพอใจของผู้เข้าร่วมงานบุญเดือนสิบ ปี 2025",
+  "author": "evo_reaction@hotmail.com",
+  "category": {
+    "id": 10,
+    "name": "เดือนสิบเมืองคอน",
+    "slug": "nakhonsithammarat",
+    "description": "งานบุญเดือนสิบ",
+    "post_count": 9
+  },
+  "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/a1b2c3d4.docx",
+  "is_published": true,
+  "survey_date": "2025-10-15",
+  "response_count": 45,
+  "view_count": 120,
+  "created_at": "2025-10-01T10:00:00+07:00",
+  "updated_at": "2025-10-05T14:30:00+07:00",
+  "published_at": "2025-10-02T09:00:00+07:00",
+  "responses": {
+    "total": 45,
+    "verified": 42,
+    "complete": 44
+  }
+}
+```
+
+### GET /api/v1/surveys/latest/
+Get latest published surveys
+- **Query params:** `?limit=10` (default: 10, max: 50)
+
+### GET /api/v1/surveys/popular/
+Get most popular surveys by view count
+- **Query params:** `?limit=10` (default: 10, max: 50)
+
+### GET /api/v1/categories/{slug}/surveys/
+Get all surveys in a category
+```json
+{
+  "category": {
+    "id": 10,
+    "name": "เดือนสิบเมืองคอน",
+    "slug": "nakhonsithammarat",
+    "description": "งานบุญเดือนสิบ"
+  },
+  "surveys": [
+    {
+      "id": 1,
+      "title": "แบบสำรวจความพึงพอใจในงานบุญเดือนสิบ",
+      "slug": "survey-satisfaction-2025",
+      "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/a1b2c3d4.docx",
+      "response_count": 45,
+      "view_count": 120
+    }
+  ]
+}
+```
+
 ## 📊 Current Data Summary
 - **Categories**: 2 active categories (เดือนสิบเมืองคอน, บวชสร้างสุข วิถีอ่างทอง)
 - **Posts**: 12 published posts with rich content
 - **Videos**: 11 published videos with Facebook integration
+- **Surveys**: New survey system for data collection
 - **Post Types**: 6 types (Infographic, Article, Facebook Post, etc.)
 - **Tags**: Active tagging system with Thai language support
 - **Media**: Azure Blob Storage integration for images and thumbnails

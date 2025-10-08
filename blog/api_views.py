@@ -2,7 +2,7 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Post, Category, PostType, Video
+from .models import Post, Category, PostType, Video, Survey, SurveyResponse
 from .serializers import (
     CategorySerializer,
     PostTypeSerializer,
@@ -10,7 +10,10 @@ from .serializers import (
     PostListSerializer,
     PostDetailSerializer,
     VideoListSerializer,
-    VideoDetailSerializer
+    VideoDetailSerializer,
+    SurveyListSerializer,
+    SurveyDetailSerializer,
+    SurveyResponseSerializer
 )
 from taggit.models import Tag
 
@@ -281,12 +284,111 @@ def videos_by_tag(request, tag_slug):
             tags=tag,
             status='published'
         ).select_related('author', 'category').prefetch_related('tags').order_by('-created_at')
-        
+
         serializer = VideoListSerializer(videos, many=True, context={'request': request})
-        
+
         return Response({
             'tag': TagSerializer(tag).data,
             'videos': serializer.data
         })
     except Tag.DoesNotExist:
         return Response({'error': 'Tag not found'}, status=404)
+
+
+# Survey API Views
+class SurveyListView(generics.ListAPIView):
+    """
+    API view to list published surveys with pagination
+    Supports search by title and description
+    """
+    serializer_class = SurveyListSerializer
+
+    def get_queryset(self):
+        queryset = Survey.objects.filter(is_published=True).select_related('author', 'category')
+
+        # Search functionality
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(category__name__icontains=search)
+            )
+
+        # Filter by category
+        category_slug = self.request.query_params.get('category', None)
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+
+        return queryset.order_by('-created_at')
+
+
+class SurveyDetailView(generics.RetrieveAPIView):
+    """
+    API view to retrieve a single survey by slug
+    Also increments view count
+    """
+    queryset = Survey.objects.filter(is_published=True).select_related('author', 'category')
+    serializer_class = SurveyDetailSerializer
+    lookup_field = 'slug'
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Increment view count
+        instance.view_count += 1
+        instance.save(update_fields=['view_count'])
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def latest_surveys(request):
+    """
+    API endpoint to get latest published surveys
+    """
+    limit = int(request.query_params.get('limit', 10))
+    if limit > 50:  # Maximum limit
+        limit = 50
+
+    surveys = Survey.objects.filter(is_published=True).select_related('author', 'category').order_by('-created_at')[:limit]
+
+    serializer = SurveyListSerializer(surveys, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def popular_surveys(request):
+    """
+    API endpoint to get most popular surveys by view count
+    """
+    limit = int(request.query_params.get('limit', 10))
+    if limit > 50:  # Maximum limit
+        limit = 50
+
+    surveys = Survey.objects.filter(is_published=True).select_related('author', 'category').order_by('-view_count')[:limit]
+
+    serializer = SurveyListSerializer(surveys, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def surveys_by_category(request, category_slug):
+    """
+    API endpoint to get surveys by category slug
+    """
+    try:
+        category = Category.objects.get(slug=category_slug)
+        surveys = Survey.objects.filter(
+            category=category,
+            is_published=True
+        ).select_related('author', 'category').order_by('-created_at')
+
+        serializer = SurveyListSerializer(surveys, many=True, context={'request': request})
+
+        return Response({
+            'category': CategorySerializer(category).data,
+            'surveys': serializer.data
+        })
+    except Category.DoesNotExist:
+        return Response({'error': 'Category not found'}, status=404)

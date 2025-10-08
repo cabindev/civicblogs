@@ -9,12 +9,6 @@ import uuid
 import os
 import re
 
-# Import Social Media models (with error handling)
-try:
-    from .social_models import SocialPost, PostAnalyticsSummary
-except ImportError:
-    SocialPost = None
-    PostAnalyticsSummary = None
 from django.utils.html import strip_tags
 
 # Get Azure Storage instance
@@ -328,9 +322,150 @@ class ContactMessage(models.Model):
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-    
+
     class Meta:
         ordering = ['-created_at']
-    
+
     def __str__(self):
         return f'{self.subject} - {self.name}'
+
+
+def upload_survey_file(instance, filename):
+    """Upload path for survey files (Word/Excel)"""
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+    return os.path.join('surveys/files', filename)
+
+
+class Survey(models.Model):
+    """แบบสำรวจและข้อมูลการสำรวจ (เอกสารที่สำรวจมาแล้ว)"""
+
+    title = models.CharField('ชื่อแบบสำรวจ', max_length=200)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    description = models.TextField('คำอธิบาย', blank=True)
+
+    # File uploads (Word/Excel)
+    survey_file = models.FileField(
+        'ไฟล์แบบสำรวจ',
+        upload_to=upload_survey_file,
+        blank=True,
+        null=True,
+        help_text='อัปโหลดไฟล์ Word (.docx) หรือ Excel (.xlsx, .xls)'
+    )
+
+    # Metadata
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='surveys', verbose_name='ผู้สร้าง')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='surveys', verbose_name='หมวดหมู่')
+
+    # Publication status (เผยแพร่/ไม่เผยแพร่)
+    is_published = models.BooleanField('เผยแพร่', default=False, help_text='เผยแพร่เอกสารการสำรวจให้สาธารณะเห็น')
+
+    # Dates
+    survey_date = models.DateField('วันที่สำรวจ', null=True, blank=True, help_text='วันที่ทำการสำรวจ')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField('เผยแพร่เมื่อ', null=True, blank=True)
+
+    # Analytics
+    response_count = models.PositiveIntegerField('จำนวนผู้ตอบ', default=0)
+    view_count = models.PositiveIntegerField('จำนวนครั้งที่เข้าชม', default=0)
+
+    class Meta:
+        verbose_name = 'แบบสำรวจ'
+        verbose_name_plural = 'แบบสำรวจ'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['is_published']),
+            models.Index(fields=['slug']),
+        ]
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils import timezone
+
+            slug_text = self.title.lower()
+            slug_text = re.sub(r'[^\w\s-]', '', slug_text)
+            slug_text = re.sub(r'[-\s]+', '-', slug_text)
+
+            if not slug_text or slug_text == '-':
+                timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+                slug_text = f"survey-{timestamp}"
+
+            base_slug = slugify(slug_text) or f"survey-{timezone.now().strftime('%Y%m%d%H%M%S')}"
+            slug = base_slug
+            counter = 1
+
+            while Survey.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        # Set published_at when first published
+        if self.is_published and not self.published_at:
+            from django.utils import timezone
+            self.published_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('blog:survey_detail', kwargs={'slug': self.slug})
+
+
+class SurveyResponse(models.Model):
+    """คำตอบของแบบสำรวจ"""
+
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses', verbose_name='แบบสำรวจ')
+    respondent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='survey_responses', verbose_name='ผู้ตอบ')
+
+    # Response data (JSON format for flexibility)
+    response_data = models.JSONField('ข้อมูลคำตอบ', default=dict, blank=True)
+
+    # File upload for response (optional - if respondent uploads filled Word/Excel)
+    response_file = models.FileField(
+        'ไฟล์คำตอบ',
+        upload_to=upload_survey_file,
+        blank=True,
+        null=True,
+        help_text='อัปโหลดไฟล์ Word/Excel ที่กรอกข้อมูลแล้ว'
+    )
+
+    # Metadata
+    respondent_email = models.EmailField('อีเมลผู้ตอบ', blank=True)
+    respondent_name = models.CharField('ชื่อผู้ตอบ', max_length=200, blank=True)
+    ip_address = models.GenericIPAddressField('IP Address', null=True, blank=True)
+
+    # Timestamps
+    submitted_at = models.DateTimeField('ส่งคำตอบเมื่อ', auto_now_add=True)
+    updated_at = models.DateTimeField('แก้ไขล่าสุด', auto_now=True)
+
+    # Status
+    is_complete = models.BooleanField('เสร็จสมบูรณ์', default=True)
+    is_verified = models.BooleanField('ตรวจสอบแล้ว', default=False)
+
+    class Meta:
+        verbose_name = 'คำตอบแบบสำรวจ'
+        verbose_name_plural = 'คำตอบแบบสำรวจ'
+        ordering = ['-submitted_at']
+        indexes = [
+            models.Index(fields=['-submitted_at']),
+            models.Index(fields=['survey', '-submitted_at']),
+        ]
+
+    def __str__(self):
+        name = self.respondent_name or self.respondent_email or 'Anonymous'
+        return f'{self.survey.title} - {name}'
+
+    def save(self, *args, **kwargs):
+        # Auto-increment response count on survey
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new and self.is_complete:
+            Survey.objects.filter(pk=self.survey.pk).update(
+                response_count=models.F('response_count') + 1
+            )

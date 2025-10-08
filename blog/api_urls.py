@@ -31,4 +31,13 @@ urlpatterns = [
     # Videos by category and tag
     path('categories/<slug:category_slug>/videos/', api_views.videos_by_category, name='videos-by-category'),
     path('tags/<slug:tag_slug>/videos/', api_views.videos_by_tag, name='videos-by-tag'),
+
+    # Surveys
+    path('surveys/', api_views.SurveyListView.as_view(), name='survey-list'),
+    path('surveys/latest/', api_views.latest_surveys, name='latest-surveys'),
+    path('surveys/popular/', api_views.popular_surveys, name='popular-surveys'),
+    path('surveys/<slug:slug>/', api_views.SurveyDetailView.as_view(), name='survey-detail'),
+
+    # Surveys by category
+    path('categories/<slug:category_slug>/surveys/', api_views.surveys_by_category, name='surveys-by-category'),
 ]

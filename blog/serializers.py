@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Category, PostType, Video
+from .models import Post, Category, PostType, Video, Survey, SurveyResponse
 from taggit.models import Tag
 
 
@@ -135,15 +135,15 @@ class VideoDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     thumbnail_url = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Video
         fields = [
-            'id', 'title', 'slug', 'description', 'video_url', 'author', 
+            'id', 'title', 'slug', 'description', 'video_url', 'author',
             'category', 'tags', 'thumbnail_url', 'thumbnail_alt',
             'created_at', 'updated_at', 'view_count', 'status'
         ]
-    
+
     def get_thumbnail_url(self, obj):
         """Get full URL for video thumbnail"""
         if obj.thumbnail:
@@ -151,4 +151,87 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             if request:
                 return request.build_absolute_uri(obj.thumbnail.url)
             return obj.thumbnail.url
+        return None
+
+
+class SurveyListSerializer(serializers.ModelSerializer):
+    """Serializer for Survey list view"""
+    author = serializers.StringRelatedField()
+    category = CategorySerializer(read_only=True)
+    survey_file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Survey
+        fields = [
+            'id', 'title', 'slug', 'description', 'author', 'category',
+            'survey_file_url', 'is_published', 'survey_date',
+            'response_count', 'view_count', 'created_at', 'updated_at', 'published_at'
+        ]
+
+    def get_survey_file_url(self, obj):
+        """Get full URL for survey file"""
+        if obj.survey_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.survey_file.url)
+            return obj.survey_file.url
+        return None
+
+
+class SurveyDetailSerializer(serializers.ModelSerializer):
+    """Serializer for Survey detail view"""
+    author = serializers.StringRelatedField()
+    category = CategorySerializer(read_only=True)
+    survey_file_url = serializers.SerializerMethodField()
+    responses = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Survey
+        fields = [
+            'id', 'title', 'slug', 'description', 'author', 'category',
+            'survey_file_url', 'is_published', 'survey_date',
+            'response_count', 'view_count', 'created_at', 'updated_at',
+            'published_at', 'responses'
+        ]
+
+    def get_survey_file_url(self, obj):
+        """Get full URL for survey file"""
+        if obj.survey_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.survey_file.url)
+            return obj.survey_file.url
+        return None
+
+    def get_responses(self, obj):
+        """Get response count summary"""
+        return {
+            'total': obj.response_count,
+            'verified': obj.responses.filter(is_verified=True).count(),
+            'complete': obj.responses.filter(is_complete=True).count()
+        }
+
+
+class SurveyResponseSerializer(serializers.ModelSerializer):
+    """Serializer for SurveyResponse"""
+    survey_title = serializers.CharField(source='survey.title', read_only=True)
+    respondent_username = serializers.CharField(source='respondent.username', read_only=True)
+    response_file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SurveyResponse
+        fields = [
+            'id', 'survey', 'survey_title', 'respondent', 'respondent_username',
+            'respondent_name', 'respondent_email', 'response_data',
+            'response_file_url', 'is_complete', 'is_verified',
+            'submitted_at', 'updated_at'
+        ]
+
+    def get_response_file_url(self, obj):
+        """Get full URL for response file"""
+        if obj.response_file:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.response_file.url)
+            return obj.response_file.url
         return None
