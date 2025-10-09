@@ -367,7 +367,7 @@ class Survey(models.Model):
     published_at = models.DateTimeField('เผยแพร่เมื่อ', null=True, blank=True)
 
     # Analytics
-    response_count = models.PositiveIntegerField('จำนวนผู้ตอบ', default=0)
+    respondent_count = models.PositiveIntegerField('จำนวนผู้ตอบแบบสำรวจ', default=0, help_text='จำนวนผู้ตอบแบบสำรวจ (คน)')
     view_count = models.PositiveIntegerField('จำนวนครั้งที่เข้าชม', default=0)
 
     class Meta:
@@ -414,58 +414,3 @@ class Survey(models.Model):
 
     def get_absolute_url(self):
         return reverse('blog:survey_detail', kwargs={'slug': self.slug})
-
-
-class SurveyResponse(models.Model):
-    """คำตอบของแบบสำรวจ"""
-
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name='responses', verbose_name='แบบสำรวจ')
-    respondent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='survey_responses', verbose_name='ผู้ตอบ')
-
-    # Response data (JSON format for flexibility)
-    response_data = models.JSONField('ข้อมูลคำตอบ', default=dict, blank=True)
-
-    # File upload for response (optional - if respondent uploads filled Word/Excel)
-    response_file = models.FileField(
-        'ไฟล์คำตอบ',
-        upload_to=upload_survey_file,
-        blank=True,
-        null=True,
-        help_text='อัปโหลดไฟล์ Word/Excel ที่กรอกข้อมูลแล้ว'
-    )
-
-    # Metadata
-    respondent_email = models.EmailField('อีเมลผู้ตอบ', blank=True)
-    respondent_name = models.CharField('ชื่อผู้ตอบ', max_length=200, blank=True)
-    ip_address = models.GenericIPAddressField('IP Address', null=True, blank=True)
-
-    # Timestamps
-    submitted_at = models.DateTimeField('ส่งคำตอบเมื่อ', auto_now_add=True)
-    updated_at = models.DateTimeField('แก้ไขล่าสุด', auto_now=True)
-
-    # Status
-    is_complete = models.BooleanField('เสร็จสมบูรณ์', default=True)
-    is_verified = models.BooleanField('ตรวจสอบแล้ว', default=False)
-
-    class Meta:
-        verbose_name = 'คำตอบแบบสำรวจ'
-        verbose_name_plural = 'คำตอบแบบสำรวจ'
-        ordering = ['-submitted_at']
-        indexes = [
-            models.Index(fields=['-submitted_at']),
-            models.Index(fields=['survey', '-submitted_at']),
-        ]
-
-    def __str__(self):
-        name = self.respondent_name or self.respondent_email or 'Anonymous'
-        return f'{self.survey.title} - {name}'
-
-    def save(self, *args, **kwargs):
-        # Auto-increment response count on survey
-        is_new = self.pk is None
-        super().save(*args, **kwargs)
-
-        if is_new and self.is_complete:
-            Survey.objects.filter(pk=self.survey.pk).update(
-                response_count=models.F('response_count') + 1
-            )

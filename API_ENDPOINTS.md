@@ -730,16 +730,11 @@ Get single survey by slug (increments view count automatically)
   "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/a1b2c3d4.docx",
   "is_published": true,
   "survey_date": "2025-10-15",
-  "response_count": 45,
+  "respondent_count": 45,
   "view_count": 120,
   "created_at": "2025-10-01T10:00:00+07:00",
   "updated_at": "2025-10-05T14:30:00+07:00",
-  "published_at": "2025-10-02T09:00:00+07:00",
-  "responses": {
-    "total": 45,
-    "verified": 42,
-    "complete": 44
-  }
+  "published_at": "2025-10-02T09:00:00+07:00"
 }
 ```
 
@@ -767,7 +762,7 @@ Get all surveys in a category
       "title": "แบบสำรวจความพึงพอใจในงานบุญเดือนสิบ",
       "slug": "survey-satisfaction-2025",
       "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/a1b2c3d4.docx",
-      "response_count": 45,
+      "respondent_count": 45,
       "view_count": 120
     }
   ]

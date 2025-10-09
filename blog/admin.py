@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
-from .models import Post, Category, PostType, Newsletter, ContactMessage, Video, Survey, SurveyResponse
+from .models import Post, Category, PostType, Newsletter, ContactMessage, Video, Survey
 
 # Customize admin site
 admin.site.site_header = "การจัดการ Civicspace"
@@ -192,28 +192,15 @@ class ContactMessageAdmin(admin.ModelAdmin):
     mark_as_unread.short_description = "Mark selected messages as unread"
 
 
-class SurveyResponseInline(admin.TabularInline):
-    model = SurveyResponse
-    extra = 0
-    readonly_fields = ['respondent', 'respondent_name', 'respondent_email', 'submitted_at', 'is_complete']
-    fields = ['respondent', 'respondent_name', 'respondent_email', 'is_complete', 'is_verified', 'submitted_at']
-    can_delete = False
-    show_change_link = True
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ['title', 'is_published', 'response_count', 'view_count', 'survey_date', 'created_at']
+    list_display = ['title', 'is_published', 'respondent_count', 'view_count', 'survey_date', 'created_at']
     list_filter = ['is_published', 'created_at', 'survey_date', 'category']
     search_fields = ['title', 'description', 'author__username']
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'created_at'
     list_per_page = 25
     actions = ['mark_as_published', 'mark_as_unpublished']
-    inlines = [SurveyResponseInline]
 
     fieldsets = (
         ('ข้อมูลพื้นฐาน', {
@@ -232,12 +219,12 @@ class SurveyAdmin(admin.ModelAdmin):
             'description': 'วันที่ทำการสำรวจ'
         }),
         ('สถิติ', {
-            'fields': ('response_count', 'view_count'),
+            'fields': ('respondent_count', 'view_count'),
             'classes': ('collapse',)
         }),
     )
 
-    readonly_fields = ['response_count', 'view_count', 'published_at']
+    readonly_fields = ['respondent_count', 'view_count', 'published_at']
 
     def mark_as_published(self, request, queryset):
         from django.utils import timezone
@@ -263,57 +250,3 @@ class SurveyAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('author', 'category')
-
-
-@admin.register(SurveyResponse)
-class SurveyResponseAdmin(admin.ModelAdmin):
-    list_display = ['survey', 'get_respondent_info', 'is_complete', 'is_verified', 'submitted_at']
-    list_filter = ['is_complete', 'is_verified', 'submitted_at', 'survey']
-    search_fields = ['respondent_name', 'respondent_email', 'respondent__username', 'survey__title']
-    date_hierarchy = 'submitted_at'
-    list_per_page = 50
-    actions = ['mark_as_verified', 'mark_as_unverified']
-
-    fieldsets = (
-        ('แบบสำรวจ', {
-            'fields': ('survey',)
-        }),
-        ('ข้อมูลผู้ตอบ', {
-            'fields': ('respondent', 'respondent_name', 'respondent_email', 'ip_address')
-        }),
-        ('คำตอบ', {
-            'fields': ('response_data', 'response_file')
-        }),
-        ('สถานะ', {
-            'fields': ('is_complete', 'is_verified', 'submitted_at', 'updated_at')
-        }),
-    )
-
-    readonly_fields = ['submitted_at', 'updated_at', 'ip_address']
-
-    def get_respondent_info(self, obj):
-        if obj.respondent:
-            return format_html(
-                '<strong>{}</strong><br><small>{}</small>',
-                obj.respondent.username,
-                obj.respondent.email
-            )
-        elif obj.respondent_name or obj.respondent_email:
-            name = obj.respondent_name or 'Anonymous'
-            email = obj.respondent_email or '-'
-            return format_html('<strong>{}</strong><br><small>{}</small>', name, email)
-        return 'Anonymous'
-    get_respondent_info.short_description = 'ผู้ตอบ'
-
-    def mark_as_verified(self, request, queryset):
-        queryset.update(is_verified=True)
-        self.message_user(request, f'{queryset.count()} คำตอบถูกตรวจสอบแล้ว')
-    mark_as_verified.short_description = "ทำเครื่องหมายว่าตรวจสอบแล้ว"
-
-    def mark_as_unverified(self, request, queryset):
-        queryset.update(is_verified=False)
-        self.message_user(request, f'{queryset.count()} คำตอบถูกยกเลิกการตรวจสอบ')
-    mark_as_unverified.short_description = "ยกเลิกการตรวจสอบ"
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('survey', 'respondent')

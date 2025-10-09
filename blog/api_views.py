@@ -2,7 +2,7 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Post, Category, PostType, Video, Survey, SurveyResponse
+from .models import Post, Category, PostType, Video, Survey
 from .serializers import (
     CategorySerializer,
     PostTypeSerializer,
@@ -12,8 +12,7 @@ from .serializers import (
     VideoListSerializer,
     VideoDetailSerializer,
     SurveyListSerializer,
-    SurveyDetailSerializer,
-    SurveyResponseSerializer
+    SurveyDetailSerializer
 )
 from taggit.models import Tag
 

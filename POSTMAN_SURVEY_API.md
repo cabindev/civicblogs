@@ -42,7 +42,7 @@ Accept: application/json
       "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/b72e3bb5-b1a8-41b0-9872-86b8fb98605b.docx",
       "is_published": true,
       "survey_date": "2025-09-22",
-      "response_count": 0,
+      "respondent_count": 0,
       "view_count": 0,
       "created_at": "2025-10-08T11:44:48.202564+07:00",
       "updated_at": "2025-10-08T11:44:48.202601+07:00",
@@ -83,16 +83,11 @@ Accept: application/json
   "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/b72e3bb5-b1a8-41b0-9872-86b8fb98605b.docx",
   "is_published": true,
   "survey_date": "2025-09-22",
-  "response_count": 0,
+  "respondent_count": 0,
   "view_count": 1,
   "created_at": "2025-10-08T11:44:48.202564+07:00",
   "updated_at": "2025-10-08T11:44:48.202601+07:00",
-  "published_at": "2025-10-08T11:44:48.082104+07:00",
-  "responses": {
-    "total": 0,
-    "verified": 0,
-    "complete": 0
-  }
+  "published_at": "2025-10-08T11:44:48.082104+07:00"
 }
 ```
 
@@ -165,7 +160,7 @@ http://127.0.0.1:8000/api/v1/surveys/popular/?limit=3
       "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/b72e3bb5-b1a8-41b0-9872-86b8fb98605b.docx",
       "is_published": true,
       "survey_date": "2025-09-22",
-      "response_count": 0,
+      "respondent_count": 0,
       "view_count": 1,
       "created_at": "2025-10-08T11:44:48.202564+07:00",
       "updated_at": "2025-10-08T11:44:48.202601+07:00",
@@ -305,17 +300,11 @@ curl -X GET "http://127.0.0.1:8000/api/v1/surveys/?category=nakhonsithammarat" \
 - `survey_file_url`: URL ไฟล์ Word/Excel (Azure Blob Storage)
 - `is_published`: เผยแพร่หรือไม่ (true/false)
 - `survey_date`: วันที่สำรวจ (YYYY-MM-DD)
-- `response_count`: จำนวนคำตอบ
+- `respondent_count`: จำนวนผู้ตอบแบบสำรวจ (คน)
 - `view_count`: จำนวนครั้งที่เข้าชม
 - `created_at`: วันที่สร้าง (ISO 8601)
 - `updated_at`: วันที่อัปเดตล่าสุด
 - `published_at`: วันที่เผยแพร่
-
-### Survey Detail Response (Additional Fields):
-- `responses`: สถิติคำตอบ
-  - `total`: จำนวนคำตอบทั้งหมด
-  - `verified`: จำนวนคำตอบที่ตรวจสอบแล้ว
-  - `complete`: จำนวนคำตอบที่กรอกครบ
 
 ---
 
