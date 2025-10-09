@@ -1,8 +1,22 @@
 # CivicSpace API Endpoints
 
-**Production Base URL:** `https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net`  
-**Development Base URL:** `http://127.0.0.1:8000`  
+**Production Base URL:** `https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net`
+**Development Base URL:** `http://127.0.0.1:8000`
 **API Version:** `v1`
+
+---
+
+## 📋 Table of Contents
+- [Categories API](#categories)
+- [Post Types API](#post-types)
+- [Posts API](#posts)
+- [Videos API](#videos)
+- [Surveys API](#surveys) ⭐ NEW
+- [Tags API](#tags)
+- [Next.js Integration](#nextjs-integration)
+- [Data Summary](#-current-data-summary)
+
+---
 
 ## 🔗 API Root
 All API endpoints are available under `/api/v1/`
@@ -706,13 +720,49 @@ async getPosts(params = {}) {
 
 ### GET /api/v1/surveys/
 Get paginated list of all published surveys
-- **Query params:**
-  - `page=2` - Pagination (20 surveys per page)
-  - `search=keyword` - Search in title and description
-  - `category=slug` - Filter by category slug
+
+**Query Parameters:**
+- `page=2` - Pagination (20 surveys per page)
+- `search=keyword` - Search in title and description
+- `category=slug` - Filter by category slug
+
+**Response Example:**
+```json
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "title": "แบบสำรวจความพึงพอใจในงานบุญเดือนสิบ",
+      "slug": "survey-satisfaction-2025",
+      "description": "แบบสำรวจความพึงพอใจของผู้เข้าร่วมงานบุญเดือนสิบ ปี 2025",
+      "author": "evo_reaction@hotmail.com",
+      "category": {
+        "id": 10,
+        "name": "เดือนสิบเมืองคอน",
+        "slug": "nakhonsithammarat",
+        "description": "งานบุญเดือนสิบ",
+        "post_count": 12
+      },
+      "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/a1b2c3d4.docx",
+      "is_published": true,
+      "survey_date": "2025-10-15",
+      "respondent_count": 45,
+      "view_count": 120,
+      "created_at": "2025-10-01T10:00:00+07:00",
+      "updated_at": "2025-10-05T14:30:00+07:00",
+      "published_at": "2025-10-02T09:00:00+07:00"
+    }
+  ]
+}
+```
 
 ### GET /api/v1/surveys/{slug}/
 Get single survey by slug (increments view count automatically)
+
+**Response:**
 ```json
 {
   "id": 1,
@@ -725,29 +775,63 @@ Get single survey by slug (increments view count automatically)
     "name": "เดือนสิบเมืองคอน",
     "slug": "nakhonsithammarat",
     "description": "งานบุญเดือนสิบ",
-    "post_count": 9
+    "post_count": 12
   },
   "survey_file_url": "https://civicblogs12.blob.core.windows.net/media/surveys/files/a1b2c3d4.docx",
   "is_published": true,
   "survey_date": "2025-10-15",
   "respondent_count": 45,
-  "view_count": 120,
+  "view_count": 121,
   "created_at": "2025-10-01T10:00:00+07:00",
   "updated_at": "2025-10-05T14:30:00+07:00",
   "published_at": "2025-10-02T09:00:00+07:00"
 }
 ```
 
+**Field Descriptions:**
+- `respondent_count`: จำนวนผู้ตอบแบบสำรวจ (คน)
+- `view_count`: จำนวนครั้งที่เปิดดู (เพิ่มอัตโนมัติทุกครั้งที่เรียก API นี้)
+- `survey_file_url`: URL ไฟล์เอกสาร Word/Excel ที่เก็บใน Azure Blob Storage
+- `survey_date`: วันที่ทำการสำรวจ
+- `is_published`: สถานะการเผยแพร่
+
+---
+
 ### GET /api/v1/surveys/latest/
-Get latest published surveys
-- **Query params:** `?limit=10` (default: 10, max: 50)
+Get latest published surveys (เรียงตาม published_at)
+
+**Query Parameters:**
+- `limit` - จำนวนผลลัพธ์ (default: 10, max: 50)
+
+**Example:**
+```
+GET /api/v1/surveys/latest/?limit=5
+```
+
+---
 
 ### GET /api/v1/surveys/popular/
-Get most popular surveys by view count
-- **Query params:** `?limit=10` (default: 10, max: 50)
+Get most popular surveys (เรียงตาม view_count)
+
+**Query Parameters:**
+- `limit` - จำนวนผลลัพธ์ (default: 10, max: 50)
+
+**Example:**
+```
+GET /api/v1/surveys/popular/?limit=10
+```
+
+---
 
 ### GET /api/v1/categories/{slug}/surveys/
-Get all surveys in a category
+Get all surveys in a specific category
+
+**Example:**
+```
+GET /api/v1/categories/nakhonsithammarat/surveys/
+```
+
+**Response:**
 ```json
 {
   "category": {
@@ -769,11 +853,34 @@ Get all surveys in a category
 }
 ```
 
+---
+
 ## 📊 Current Data Summary
 - **Categories**: 2 active categories (เดือนสิบเมืองคอน, บวชสร้างสุข วิถีอ่างทอง)
 - **Posts**: 12 published posts with rich content
 - **Videos**: 11 published videos with Facebook integration
-- **Surveys**: New survey system for data collection
+- **Surveys**: Survey system with document storage (respondent tracking)
 - **Post Types**: 6 types (Infographic, Article, Facebook Post, etc.)
 - **Tags**: Active tagging system with Thai language support
-- **Media**: Azure Blob Storage integration for images and thumbnails
+- **Media**: Azure Blob Storage integration for images and files
+
+---
+
+## 🚀 API Status
+
+**Last Updated**: October 9, 2025
+**API Version**: v1
+**Status**: ✅ Production Ready
+**Features**:
+- ✅ Posts API (CRUD with filtering, search, pagination)
+- ✅ Videos API (YouTube embed support)
+- ✅ Categories API (with post counts)
+- ✅ Tags API (Thai language support)
+- ✅ **Surveys API** (Document-based surveys with respondent counting)
+- ✅ Search & Filter across all content types
+- ✅ Azure Blob Storage for media files
+- ✅ Next.js integration ready
+
+**Production URL**: `https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net`
+**Database**: Supabase PostgreSQL
+**Storage**: Azure Blob Storage (civicblogs12)
