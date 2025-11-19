@@ -13,13 +13,21 @@ admin.site.index_title = "ยินดีต้อนรับสู่ระบ
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'post_count', 'created_at']
+    list_display = ['name', 'slug', 'post_count', 'video_count', 'survey_count', 'created_at']
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name', 'description']
-    
+
     def post_count(self, obj):
         return obj.posts.count()
     post_count.short_description = 'Posts'
+
+    def video_count(self, obj):
+        return obj.videos.count()
+    video_count.short_description = 'Videos'
+
+    def survey_count(self, obj):
+        return obj.surveys.count()
+    survey_count.short_description = 'Surveys'
 
 
 @admin.register(PostType)
