@@ -6,14 +6,33 @@ from taggit.models import Tag
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for Category model"""
     post_count = serializers.SerializerMethodField()
-    
+    video_count = serializers.SerializerMethodField()
+    survey_count = serializers.SerializerMethodField()
+    total_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'description', 'post_count']
-    
+        fields = ['id', 'name', 'slug', 'description', 'post_count', 'video_count', 'survey_count', 'total_count']
+
     def get_post_count(self, obj):
         """Get published post count for this category"""
         return obj.posts.filter(status='published').count()
+
+    def get_video_count(self, obj):
+        """Get published video count for this category"""
+        return obj.videos.filter(status='published').count()
+
+    def get_survey_count(self, obj):
+        """Get published survey count for this category"""
+        return obj.surveys.filter(is_published=True).count()
+
+    def get_total_count(self, obj):
+        """Get total content count (posts + videos + surveys)"""
+        return (
+            obj.posts.filter(status='published').count() +
+            obj.videos.filter(status='published').count() +
+            obj.surveys.filter(is_published=True).count()
+        )
 
 
 class PostTypeSerializer(serializers.ModelSerializer):
