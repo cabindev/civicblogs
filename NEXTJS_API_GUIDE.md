@@ -50,21 +50,101 @@ export interface Category {
   total_count: number;
 }
 
-export interface CategoryResponse {
+export interface PostType {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  color: string;
+  post_count: number;
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  author: string;
+  author_username: string;
+  category: Category;
+  post_type: PostType | null;
+  tags: Tag[];
+  featured_image_url: string | null;
+  featured_image_alt: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  view_count: number;
+  reading_time: number;
+  status: 'draft' | 'published' | 'archived';
+}
+
+export interface PostDetail extends Post {
+  content: string;
+  meta_description: string;
+  meta_keywords: string;
+}
+
+export interface Video {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  video_url: string;
+  author: string;
+  author_username: string;
+  category: Category | null;
+  tags: Tag[];
+  thumbnail_url: string | null;
+  thumbnail_alt: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  view_count: number;
+  status: 'draft' | 'published' | 'archived';
+}
+
+export interface Survey {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  author: string;
+  author_username: string;
+  category: Category | null;
+  survey_file_url: string | null;
+  is_published: boolean;
+  survey_date: string | null;
+  respondent_count: number;
+  view_count: number;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+}
+
+export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
-  results: Category[];
+  results: T[];
 }
 ```
 
-### 2. Fetch Categories
+### 2. API Functions
 
 ```typescript
 // lib/api.ts
 
 const API_BASE_URL = 'https://civicspace-gqdcg0dxgjbqe8as.southeastasia-01.azurewebsites.net/api/v1';
 
+// Categories
 export async function getCategories(): Promise<Category[]> {
   const response = await fetch(`${API_BASE_URL}/categories/`, {
     next: { revalidate: 3600 } // Cache for 1 hour
@@ -74,8 +154,145 @@ export async function getCategories(): Promise<Category[]> {
     throw new Error('Failed to fetch categories');
   }
 
-  const data: CategoryResponse = await response.json();
+  const data: PaginatedResponse<Category> = await response.json();
   return data.results;
+}
+
+export async function getCategoryBySlug(slug: string): Promise<Category> {
+  const response = await fetch(`${API_BASE_URL}/categories/${slug}/`);
+
+  if (!response.ok) {
+    throw new Error('Category not found');
+  }
+
+  return response.json();
+}
+
+// Posts
+export async function getPosts(params?: {
+  search?: string;
+  category?: string;
+  tag?: string;
+}): Promise<Post[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.set('search', params.search);
+  if (params?.category) queryParams.set('category', params.category);
+  if (params?.tag) queryParams.set('tag', params.tag);
+
+  const url = `${API_BASE_URL}/posts/${queryParams.toString() ? '?' + queryParams : ''}`;
+  const response = await fetch(url, {
+    next: { revalidate: 300 } // Cache for 5 minutes
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch posts');
+  }
+
+  return response.json();
+}
+
+export async function getPostBySlug(slug: string): Promise<PostDetail> {
+  const response = await fetch(`${API_BASE_URL}/posts/${slug}/`, {
+    cache: 'no-store' // Don't cache (for view count)
+  });
+
+  if (!response.ok) {
+    throw new Error('Post not found');
+  }
+
+  return response.json();
+}
+
+export async function getLatestPosts(limit: number = 10): Promise<Post[]> {
+  const response = await fetch(`${API_BASE_URL}/posts/latest/?limit=${limit}`, {
+    next: { revalidate: 300 }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch latest posts');
+  }
+
+  return response.json();
+}
+
+export async function getPopularPosts(limit: number = 10): Promise<Post[]> {
+  const response = await fetch(`${API_BASE_URL}/posts/popular/?limit=${limit}`, {
+    next: { revalidate: 600 }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch popular posts');
+  }
+
+  return response.json();
+}
+
+// Videos
+export async function getVideos(params?: {
+  search?: string;
+  category?: string;
+  tag?: string;
+}): Promise<Video[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.set('search', params.search);
+  if (params?.category) queryParams.set('category', params.category);
+  if (params?.tag) queryParams.set('tag', params.tag);
+
+  const url = `${API_BASE_URL}/videos/${queryParams.toString() ? '?' + queryParams : ''}`;
+  const response = await fetch(url, {
+    next: { revalidate: 300 }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch videos');
+  }
+
+  return response.json();
+}
+
+export async function getLatestVideos(limit: number = 10): Promise<Video[]> {
+  const response = await fetch(`${API_BASE_URL}/videos/latest/?limit=${limit}`, {
+    next: { revalidate: 300 }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch latest videos');
+  }
+
+  return response.json();
+}
+
+// Surveys
+export async function getSurveys(params?: {
+  search?: string;
+  category?: string;
+}): Promise<Survey[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.set('search', params.search);
+  if (params?.category) queryParams.set('category', params.category);
+
+  const url = `${API_BASE_URL}/surveys/${queryParams.toString() ? '?' + queryParams : ''}`;
+  const response = await fetch(url, {
+    next: { revalidate: 300 }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch surveys');
+  }
+
+  return response.json();
+}
+
+export async function getLatestSurveys(limit: number = 10): Promise<Survey[]> {
+  const response = await fetch(`${API_BASE_URL}/surveys/latest/?limit=${limit}`, {
+    next: { revalidate: 300 }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch latest surveys');
+  }
+
+  return response.json();
 }
 ```
 

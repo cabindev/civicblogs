@@ -59,18 +59,20 @@ class TagSerializer(serializers.ModelSerializer):
 class PostListSerializer(serializers.ModelSerializer):
     """Serializer for Post list view (lighter data)"""
     author = serializers.StringRelatedField()
+    author_username = serializers.CharField(source='author.username', read_only=True)
     category = CategorySerializer(read_only=True)
     post_type = PostTypeSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     excerpt = serializers.SerializerMethodField()
     reading_time = serializers.SerializerMethodField()
     featured_image_url = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'slug', 'excerpt', 'author', 'category', 'post_type',
-            'tags', 'featured_image_url', 'created_at', 'updated_at', 
+            'id', 'title', 'slug', 'excerpt', 'author', 'author_username',
+            'category', 'post_type', 'tags', 'featured_image_url', 'featured_image_alt',
+            'created_at', 'updated_at', 'published_at',
             'view_count', 'reading_time', 'status'
         ]
     
@@ -95,19 +97,21 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     """Serializer for Post detail view (full data)"""
     author = serializers.StringRelatedField()
+    author_username = serializers.CharField(source='author.username', read_only=True)
     category = CategorySerializer(read_only=True)
     post_type = PostTypeSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     reading_time = serializers.SerializerMethodField()
     featured_image_url = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'slug', 'content', 'author', 'category', 'post_type',
-            'tags', 'featured_image_url', 'featured_image_alt',
-            'meta_description', 'meta_keywords', 'created_at', 
-            'updated_at', 'view_count', 'reading_time', 'status'
+            'id', 'title', 'slug', 'content', 'author', 'author_username',
+            'category', 'post_type', 'tags', 'featured_image_url', 'featured_image_alt',
+            'meta_description', 'meta_keywords',
+            'created_at', 'updated_at', 'published_at',
+            'view_count', 'reading_time', 'status'
         ]
     
     def get_reading_time(self, obj):
@@ -126,16 +130,19 @@ class PostDetailSerializer(serializers.ModelSerializer):
 class VideoListSerializer(serializers.ModelSerializer):
     """Serializer for Video list view (lighter data)"""
     author = serializers.StringRelatedField()
+    author_username = serializers.CharField(source='author.username', read_only=True)
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     thumbnail_url = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Video
         fields = [
-            'id', 'title', 'slug', 'description', 'video_url', 'author', 
-            'category', 'tags', 'thumbnail_url', 'thumbnail_alt',
-            'created_at', 'updated_at', 'view_count', 'status'
+            'id', 'title', 'slug', 'description', 'video_url',
+            'author', 'author_username', 'category', 'tags',
+            'thumbnail_url', 'thumbnail_alt',
+            'created_at', 'updated_at', 'published_at',
+            'view_count', 'status'
         ]
     
     def get_thumbnail_url(self, obj):
@@ -151,6 +158,7 @@ class VideoListSerializer(serializers.ModelSerializer):
 class VideoDetailSerializer(serializers.ModelSerializer):
     """Serializer for Video detail view (full data)"""
     author = serializers.StringRelatedField()
+    author_username = serializers.CharField(source='author.username', read_only=True)
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     thumbnail_url = serializers.SerializerMethodField()
@@ -158,9 +166,11 @@ class VideoDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
         fields = [
-            'id', 'title', 'slug', 'description', 'video_url', 'author',
-            'category', 'tags', 'thumbnail_url', 'thumbnail_alt',
-            'created_at', 'updated_at', 'view_count', 'status'
+            'id', 'title', 'slug', 'description', 'video_url',
+            'author', 'author_username', 'category', 'tags',
+            'thumbnail_url', 'thumbnail_alt',
+            'created_at', 'updated_at', 'published_at',
+            'view_count', 'status'
         ]
 
     def get_thumbnail_url(self, obj):
@@ -176,15 +186,18 @@ class VideoDetailSerializer(serializers.ModelSerializer):
 class SurveyListSerializer(serializers.ModelSerializer):
     """Serializer for Survey list view"""
     author = serializers.StringRelatedField()
+    author_username = serializers.CharField(source='author.username', read_only=True)
     category = CategorySerializer(read_only=True)
     survey_file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Survey
         fields = [
-            'id', 'title', 'slug', 'description', 'author', 'category',
+            'id', 'title', 'slug', 'description',
+            'author', 'author_username', 'category',
             'survey_file_url', 'is_published', 'survey_date',
-            'respondent_count', 'view_count', 'created_at', 'updated_at', 'published_at'
+            'respondent_count', 'view_count',
+            'created_at', 'updated_at', 'published_at'
         ]
 
     def get_survey_file_url(self, obj):
@@ -200,16 +213,18 @@ class SurveyListSerializer(serializers.ModelSerializer):
 class SurveyDetailSerializer(serializers.ModelSerializer):
     """Serializer for Survey detail view"""
     author = serializers.StringRelatedField()
+    author_username = serializers.CharField(source='author.username', read_only=True)
     category = CategorySerializer(read_only=True)
     survey_file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Survey
         fields = [
-            'id', 'title', 'slug', 'description', 'author', 'category',
+            'id', 'title', 'slug', 'description',
+            'author', 'author_username', 'category',
             'survey_file_url', 'is_published', 'survey_date',
-            'respondent_count', 'view_count', 'created_at', 'updated_at',
-            'published_at'
+            'respondent_count', 'view_count',
+            'created_at', 'updated_at', 'published_at'
         ]
 
     def get_survey_file_url(self, obj):
