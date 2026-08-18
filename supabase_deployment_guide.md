@@ -7,8 +7,8 @@ This guide walks you through deploying CivicBlogs with Supabase PostgreSQL datab
 - Supabase account and project
 - Your Supabase project credentials:
   - Project URL: `https://beeydumbrvtrllpmmlos.supabase.co`
-  - Database password: `YY_h025194166`
-  - API Key (anon): `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+  - Database password: `<DATABASE_PASSWORD>`
+  - API Key (anon): `<SUPABASE_KEY>...`
 
 ## Step 1: Database Setup
 
@@ -44,11 +44,11 @@ ORDER BY tablename;
 Update your `.env` file:
 ```env
 # Database Configuration
-DATABASE_URL=postgresql://postgres:YY_h025194166@db.beeydumbrvtrllpmmlos.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:<DATABASE_PASSWORD>@db.beeydumbrvtrllpmmlos.supabase.co:5432/postgres
 
 # Supabase Configuration  
 SUPABASE_URL=https://beeydumbrvtrllpmmlos.supabase.co
-SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlZXlkdW1icnZ0cmxscG1tbG9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5NTc2NzUsImV4cCI6MjA3MjUzMzY3NX0.ObDXuAjF_cGk6ASGNQIzbtZ4mW15nyyU8inaRaNPtqE
+SUPABASE_KEY=<SUPABASE_KEY>
 ```
 
 ### 2.2 Install Additional Dependencies
@@ -175,7 +175,7 @@ The schema includes optimized indexes for:
 ### 8.2 Connection Pooling
 For production, consider using:
 ```env
-DATABASE_URL=postgresql://postgres:password@pooler.supabase.co:6543/postgres
+DATABASE_URL=postgresql://postgres:<DATABASE_PASSWORD>@pooler.supabase.co:6543/postgres
 ```
 
 ### 8.3 Real-time Subscriptions

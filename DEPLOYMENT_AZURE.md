@@ -40,8 +40,8 @@ az webapp config appsettings set \
     SECRET_KEY="your-production-secret-key-here" \
     USE_POSTGRES=True \
     SUPABASE_URL="https://beeydumbrvtrllpmmlos.supabase.co" \
-    SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-    DATABASE_URL="postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres" \
+    SUPABASE_KEY="<SUPABASE_KEY>..." \
+    DATABASE_URL="postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres" \
     ALLOWED_HOSTS="civicblogs-app.azurewebsites.net,www.civicblogs.com" \
     WEBSITE_TIME_ZONE="Asia/Bangkok"
 ```
@@ -88,8 +88,8 @@ az webapp deployment source config \
 | `SECRET_KEY` | `your-production-secret-key-here` |
 | `USE_POSTGRES` | `True` |
 | `SUPABASE_URL` | `https://beeydumbrvtrllpmmlos.supabase.co` |
-| `SUPABASE_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` |
-| `DATABASE_URL` | `postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres` |
+| `SUPABASE_KEY` | `<SUPABASE_KEY>...` |
+| `DATABASE_URL` | `postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres` |
 | `ALLOWED_HOSTS` | `civicblogs-app.azurewebsites.net` |
 | `WEBSITE_TIME_ZONE` | `Asia/Bangkok` |
 | `SCM_DO_BUILD_DURING_DEPLOYMENT` | `1` |

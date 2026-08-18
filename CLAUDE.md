@@ -86,9 +86,9 @@ class Post(models.Model):
 ```python
 # .env file
 USE_POSTGRES=True
-DATABASE_URL=postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+DATABASE_URL=postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
 SUPABASE_URL=https://beeydumbrvtrllpmmlos.supabase.co
-SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_KEY=<SUPABASE_KEY>...
 ```
 
 ### Dual Database Support

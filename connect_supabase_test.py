@@ -18,16 +18,16 @@ def test_supabase_connection():
     # Connection strings to try
     connection_strings = [
         # Correct Supabase pooler (from user)
-        'postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true',
+        'postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true',
         
         # Direct connection (from user)
-        'postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres',
+        'postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres',
         
         # Alternative without pgbouncer
-        'postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres',
+        'postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres',
         
         # With SSL
-        'postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
+        'postgresql://postgres.beeydumbrvtrllpmmlos:<DATABASE_PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
     ]
     
     for i, conn_str in enumerate(connection_strings, 1):

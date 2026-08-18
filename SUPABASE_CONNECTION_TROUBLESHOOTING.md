@@ -34,7 +34,7 @@ if USE_POSTGRES:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'postgres',
             'USER': 'postgres',
-            'PASSWORD': config('DATABASE_PASSWORD', default='YY_h025194166'),
+            'PASSWORD': config('DATABASE_PASSWORD', default='<DATABASE_PASSWORD>'),
             'HOST': config('DATABASE_HOST', default='db.beeydumbrvtrllpmmlos.supabase.co'),
             'PORT': config('DATABASE_PORT', default='5432'),
             'OPTIONS': {
@@ -99,7 +99,7 @@ DATABASE_HOST=db.beeydumbrvtrllpmmlos.supabase.co
 ### Method 3: Using DATABASE_URL
 Uncomment and use the DATABASE_URL method:
 ```env
-DATABASE_URL=postgresql://postgres:YY_h025194166@db.beeydumbrvtrllpmmlos.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:<DATABASE_PASSWORD>@db.beeydumbrvtrllpmmlos.supabase.co:5432/postgres
 ```
 
 ## Troubleshooting Steps
@@ -124,7 +124,7 @@ telnet db.beeydumbrvtrllpmmlos.supabase.co 5432
 
 ### 3. **Test Connection with psql**
 ```bash
-psql "postgresql://postgres:YY_h025194166@db.beeydumbrvtrllpmmlos.supabase.co:5432/postgres"
+psql "postgresql://postgres:<DATABASE_PASSWORD>@db.beeydumbrvtrllpmmlos.supabase.co:5432/postgres"
 ```
 
 ### 4. **Check Firewall/Network**
