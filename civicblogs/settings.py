@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from django.core.exceptions import ImproperlyConfigured
 import os
 from supabase import create_client, Client
 
@@ -22,11 +23,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-=n2rjlejn(@)^v8gya20fx4rcm+m8j=k1ws)h1mstz-=0_i7s5')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# ห้ามใส่ค่าจริงเป็น default ในไฟล์นี้ — repo เป็น public
+# dev ใช้ค่าชั่วคราวได้ แต่ production ต้องตั้ง SECRET_KEY ใน environment เท่านั้น
+SECRET_KEY = config('SECRET_KEY', default='')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-dev-only-do-not-use-in-production'
+    else:
+        raise ImproperlyConfigured(
+            'ไม่ได้ตั้ง SECRET_KEY — ตั้งใน environment '
+            '(Azure App Service > Environment variables) ก่อนรัน production'
+        )
 
 # Production hosts - should be configured via environment variables
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,*.azurewebsites.net', cast=lambda v: [s.strip() for s in v.split(',')])
@@ -96,31 +107,19 @@ WSGI_APPLICATION = 'civicblogs.wsgi.application'
 USE_POSTGRES = config('USE_POSTGRES', default=False, cast=bool)
 
 if USE_POSTGRES:
-    # Try different Supabase connection methods
-    try:
-        import dj_database_url
-        # Use direct database URL first
-        DATABASE_URL = config('DATABASE_URL', default='postgresql://postgres.beeydumbrvtrllpmmlos:YY_h025194166@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres')
-        DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-        }
-    except ImportError:
-        # Fallback to manual configuration
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'postgres',
-                'USER': 'postgres',
-                'PASSWORD': config('DATABASE_PASSWORD', default='YY_h025194166'),
-                'HOST': config('DATABASE_HOST', default='aws-1-ap-southeast-1.pooler.supabase.com'),
-                'PORT': config('DATABASE_PORT', default='5432'),
-                'OPTIONS': {
-                    'sslmode': 'require',
-                    'connect_timeout': 30,
-                },
-                'CONN_MAX_AGE': 600,
-            }
-        }
+    # ต้องตั้ง DATABASE_URL ผ่าน environment เสมอ
+    # ห้าม hardcode connection string ไว้ในไฟล์นี้ — repo เป็น public
+    import dj_database_url
+
+    DATABASE_URL = config('DATABASE_URL', default='')
+    if not DATABASE_URL:
+        raise ImproperlyConfigured(
+            'USE_POSTGRES=True แต่ไม่ได้ตั้ง DATABASE_URL — '
+            'ตั้งใน environment (Azure App Service > Environment variables) หรือไฟล์ .env'
+        )
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
 else:
     # SQLite fallback for local development
     DATABASES = {
