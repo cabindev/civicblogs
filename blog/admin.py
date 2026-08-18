@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
@@ -42,8 +43,30 @@ class PostTypeAdmin(admin.ModelAdmin):
     post_count.short_description = 'Posts'
 
 
+class RequireCategoryForm(forms.ModelForm):
+    """บังคับเลือกประเด็นก่อนบันทึก
+
+    หน้าเว็บ Next.js อ่าน category.name ตรง ๆ หลายจุดโดยไม่กัน null
+    โพสต์ที่เผยแพร่โดยไม่มีประเด็นจึงทำให้หน้าแรกพังทั้งหน้า
+    ถ้าเนื้อหาไม่เข้ากับประเด็นที่ทำอยู่ ให้เลือก "อื่นๆ"
+    """
+
+    class Meta:
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'category' in self.fields:
+            self.fields['category'].required = True
+            self.fields['category'].empty_label = '— เลือกประเด็น —'
+            self.fields['category'].help_text = (
+                'ต้องเลือกเสมอ ถ้าไม่เข้ากับประเด็นที่ทำอยู่ให้เลือก "อื่นๆ"'
+            )
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
+    form = RequireCategoryForm
     list_display = ['get_featured_image_thumbnail', 'title', 'author', 'category', 'status', 'created_at']
     list_filter = ['status', 'created_at', 'category']
     search_fields = ['title', 'author__username']
@@ -108,6 +131,7 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
+    form = RequireCategoryForm
     list_display = ['title', 'author', 'category', 'status', 'view_count', 'created_at', 'published_at']
     list_filter = ['status', 'created_at', 'category', 'tags']
     search_fields = ['title', 'description', 'author__username', 'video_url']
