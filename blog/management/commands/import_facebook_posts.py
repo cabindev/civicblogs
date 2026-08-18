@@ -244,7 +244,7 @@ class Command(BaseCommand):
             len(posts), pages, "ใหม่->เก่า" if o["newest_first"] else "เก่า->ใหม่"))
 
         created = skipped = empty = 0
-        quote_titles, no_category, no_image = [], [], 0
+        quote_titles, no_category, forced_draft, no_image = [], [], [], 0
 
         for p in posts:
             if o["max_posts"] and created >= o["max_posts"]:
@@ -286,6 +286,14 @@ class Command(BaseCommand):
             if starts_with_quote(title):
                 quote_titles.append(title)
 
+            # หน้าเว็บ Next.js อ่าน category.name ตรง ๆ หลายจุดโดยไม่กัน null
+            # โพสต์ published ที่ไม่มี category จึงทำให้หน้าแรกทั้งหน้าพัง
+            # กันไว้ที่ต้นทาง: ถ้าไม่มี category ให้เป็น draft เสมอ
+            row_status = o["status"]
+            if cat is None and row_status == "published":
+                row_status = "draft"
+                forced_draft.append(title)
+
             pic = p.get("full_picture")
             if not pic:
                 no_image += 1
@@ -308,7 +316,7 @@ class Command(BaseCommand):
                     category=cat,
                     post_type=ptype,
                     content=to_html(message),
-                    status=o["status"],
+                    status=row_status,
                     published_at=published_at,
                     meta_description=first_line(message)[:160],
                     source="facebook",
@@ -339,6 +347,14 @@ class Command(BaseCommand):
                 "\nไม่มี category %d โพสต์ (เดาไม่ได้ ปล่อยว่างไว้ให้เติมเอง):" % len(no_category)))
             for t in no_category[:8]:
                 self.stdout.write("   – %s" % t)
+
+        if forced_draft:
+            self.stdout.write(self.style.WARNING(
+                "\nบังคับเป็น draft %d โพสต์ (ไม่มี category)" % len(forced_draft)))
+            self.stdout.write(
+                "   หน้าเว็บอ่าน category.name โดยไม่กัน null — โพสต์ published ที่ไม่มี")
+            self.stdout.write(
+                "   category จะทำให้หน้าแรกพังทั้งหน้า เลือก category แล้วค่อยเผยแพร่")
 
         if quote_titles:
             self.stdout.write(self.style.WARNING(
