@@ -105,12 +105,32 @@ class Post(models.Model):
     # Analytics
     view_count = models.PositiveIntegerField(default=0)
     
+
+    # ที่มาของโพสต์ — ใช้เมื่อนำเข้าอัตโนมัติจากแพลตฟอร์มอื่น (เช่น เพจ Facebook)
+    # source_id เป็น unique เพื่อกันนำเข้าซ้ำ; โพสต์ที่คนเขียนเองปล่อยเป็น None
+    SOURCE_CHOICES = (
+        ('facebook', 'Facebook'),
+    )
+    source = models.CharField(
+        max_length=20, blank=True, choices=SOURCE_CHOICES,
+        verbose_name='ที่มา', help_text='ว่างไว้ถ้าเขียนเอง'
+    )
+    source_id = models.CharField(
+        max_length=100, unique=True, null=True, blank=True, default=None,
+        verbose_name='รหัสโพสต์ต้นทาง', help_text='กันนำเข้าซ้ำ'
+    )
+    source_url = models.URLField(
+        max_length=500, blank=True,
+        verbose_name='ลิงก์ต้นทาง', help_text='ลิงก์กลับไปโพสต์ต้นฉบับ'
+    )
+
     class Meta:
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['-created_at']),
             models.Index(fields=['status']),
             models.Index(fields=['category']),
+            models.Index(fields=['source']),
         ]
     
     def __str__(self):
