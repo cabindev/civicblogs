@@ -281,6 +281,21 @@ class Video(models.Model):
     # Analytics
     view_count = models.PositiveIntegerField(default=0)
     
+
+    # ที่มาของวิดีโอ — ใช้เมื่อนำเข้าอัตโนมัติจากเพจ Facebook
+    # source_id เป็น unique เพื่อกันนำเข้าซ้ำ; วิดีโอที่คนเพิ่มเองปล่อยเป็น None
+    SOURCE_CHOICES = (
+        ('facebook', 'Facebook'),
+    )
+    source = models.CharField(
+        max_length=20, blank=True, choices=SOURCE_CHOICES,
+        verbose_name='ที่มา', help_text='ว่างไว้ถ้าเพิ่มเอง'
+    )
+    source_id = models.CharField(
+        max_length=100, unique=True, null=True, blank=True, default=None,
+        verbose_name='รหัสโพสต์ต้นทาง', help_text='กันนำเข้าซ้ำ'
+    )
+
     class Meta:
         ordering = ['-created_at']
         indexes = [

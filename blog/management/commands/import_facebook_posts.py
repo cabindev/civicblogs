@@ -33,7 +33,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 
-from blog.models import Category, Post, PostType
+from blog.models import Category, Post, PostType, Video
 
 GRAPH = "https://graph.facebook.com/v21.0/"
 FIELDS = ("id,message,created_time,status_type,full_picture,permalink_url,"
@@ -250,6 +250,7 @@ class Command(BaseCommand):
             len(posts), pages, "ใหม่->เก่า" if o["newest_first"] else "เก่า->ใหม่"))
 
         created = skipped = empty = 0
+        n_video = n_post = 0
         quote_titles, no_category, forced_draft, no_image = [], [], [], 0
 
         for p in posts:
@@ -305,7 +306,9 @@ class Command(BaseCommand):
             if not pic:
                 no_image += 1
 
-            self.stdout.write(self.style.SUCCESS("  + %s" % title))
+            is_video = mtype == "video"
+            self.stdout.write(self.style.SUCCESS(
+                "  + [%s] %s" % ("วิดีโอ" if is_video else "โพสต์", title)))
             self.stdout.write("      %s | %s | %s | %s" % (
                 ct[:10] if ct else "-",
                 mtype or "ไม่ระบุ",
@@ -314,6 +317,37 @@ class Command(BaseCommand):
 
             created += 1
             if dry:
+                continue
+
+            if is_video:
+                if Video.objects.filter(source_id=fbid).exists():
+                    skipped += 1
+                    continue
+                with transaction.atomic():
+                    vid = Video.objects.create(
+                        title=title[:200],
+                        description=to_html(message),
+                        video_url=p.get("permalink_url") or "",
+                        category=cat,
+                        author=author,
+                        status=row_status,
+                        published_at=published_at,
+                        thumbnail_alt=title[:200],
+                        source="facebook",
+                        source_id=fbid,
+                    )
+                    if pic and not o["no_images"]:
+                        try:
+                            req = urllib.request.Request(
+                                pic, headers={"User-Agent": "civicblogs-import"})
+                            with urllib.request.urlopen(req, timeout=60) as r:
+                                blob = r.read()
+                            vid.thumbnail.save("fb_%s.jpg" % fbid.split("_")[-1],
+                                               ContentFile(blob), save=True)
+                        except Exception as e:
+                            self.stdout.write(self.style.WARNING(
+                                "      โหลดรูปไม่สำเร็จ: %s" % str(e)[:80]))
+                created += 1
                 continue
 
             with transaction.atomic():
