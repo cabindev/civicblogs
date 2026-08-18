@@ -55,7 +55,13 @@ CATEGORY_KEYWORDS = {
     "เผาเทียนเล่นไฟสุโขทัย": ["สุโขทัย", "เผาเทียน"],
     "ยี่เป็งเชียงใหม่": ["ยี่เป็ง", "เชียงใหม่"],
     "เยาวชนสุขเกินร้อย": ["ร้อยเอ็ด", "สุขเกินร้อย"],
+    "สงกรานต์ปลอดภัย": ["สงกรานต์", "ปี๋ใหม่เมือง", "สังขารล่อง", "ด่านชุมชน",
+                        "เมาไม่ขับ", "7 วันอันตราย", "อุบัติเหตุ"],
 }
+
+# ใช้เมื่อจับคู่ไม่ได้เลย — ทีมสร้าง category นี้ไว้สำหรับเนื้อหานอกประเด็นหลัก
+# ดีกว่าปล่อย category ว่าง เพราะหน้าเว็บอ่าน category.name โดยไม่กัน null
+FALLBACK_CATEGORY = "อื่นๆ"
 
 # media_type จาก Graph -> ชื่อ PostType ที่อยากใช้ เรียงตามลำดับความชอบ
 # ถ้าไม่มี PostType ชื่อนั้นในระบบจะตกไปใช้ค่า --post-type
@@ -273,6 +279,7 @@ class Command(BaseCommand):
                 guessed = guess_category(message)
                 cat = cats_by_name.get(guessed) if guessed else None
                 if cat is None:
+                    cat = cats_by_name.get(FALLBACK_CATEGORY)
                     no_category.append(title)
 
             published_at = None
@@ -344,7 +351,7 @@ class Command(BaseCommand):
 
         if no_category:
             self.stdout.write(self.style.WARNING(
-                "\nไม่มี category %d โพสต์ (เดาไม่ได้ ปล่อยว่างไว้ให้เติมเอง):" % len(no_category)))
+                "\nจับคู่ประเด็นไม่ได้ %d โพสต์ (ใส่ 'อื่นๆ' ไว้ก่อน ควรมาจัดใหม่):" % len(no_category)))
             for t in no_category[:8]:
                 self.stdout.write("   – %s" % t)
 
